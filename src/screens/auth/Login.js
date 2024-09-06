@@ -89,7 +89,7 @@ export default function Login() {
         <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
             <KeyboardAvoidingView style={{ flex: 1 }}>
                 <View style={styles.wrapper}>
-                    <Header navigation={() => navigation.navigate("onboarding")} />
+                    {/* <Header navigation={() => navigation.navigate("onboarding")} /> */}
                     <ScrollView style={{ flex: 1, paddingHorizontal: 16 }}>
                         <Text style={styles.heading}>Welcome to EasyBookings</Text>
                         <View style={{ width: "78%", marginBottom: 30 }}>

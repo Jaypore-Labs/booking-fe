@@ -7,7 +7,7 @@ export const FlashAlert = (props) => {
     showMessage({
         duration: props.duration ? props.duration : 3000,
         icon: !props.notIcon,
-        message: props.title,
+        message: props.title || "Default Title",
         action: props.action,
         type: 'success',
         floating: true,

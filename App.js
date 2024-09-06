@@ -6,6 +6,8 @@ import "react-native-gesture-handler";
 import "react-native-reanimated";
 import { enableScreens } from "react-native-screens";
 import { UserProvider } from "./src/hooks/useUser";
+import { NavigationContainer } from "@react-navigation/native";
+import { navigationRef } from "./src/utils/rootNavigation";
 
 enableScreens();
 
@@ -14,7 +16,10 @@ export default function App() {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <UserProvider>
-          <AppNavigator />
+          <NavigationContainer ref={navigationRef}>
+            <AppNavigator />
+          </NavigationContainer>
+
         </UserProvider>
       </PersistGate>
     </Provider>
