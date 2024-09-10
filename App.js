@@ -19,7 +19,6 @@ export default function App() {
           <NavigationContainer ref={navigationRef}>
             <AppNavigator />
           </NavigationContainer>
-
         </UserProvider>
       </PersistGate>
     </Provider>

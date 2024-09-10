@@ -8,7 +8,7 @@ import reducer from "./reducers";
 const persistConfig = {
     key: 'root',
     storage,
-    whitelist: ['user'],
+    whitelist: ['user', 'bookings'],
 };
 
 

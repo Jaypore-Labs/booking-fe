@@ -1,29 +1,43 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { SafeAreaView, View, Text, FlatList, Pressable, StyleSheet } from 'react-native';
 import Button from "../Button";
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchBooking } from '../../endpoints/booking.service';
+import { FlashAlert } from '../FlashAlert';
+import { setBookings } from '../../store/actions/booking';
+
 // import axios from 'axios';
 
 export default function BookingsList({ navigation }) {
-    const [bookings, setBookings] = useState([
-        { id: 1, apartmentName: '102', price: 1500, deposit: 500, description: 'best', fromDate: '15-10-2024', toDate: '17-10-2024', customerName: 'tester', phone: 5993929393 }
-    ]);
 
-    // useEffect(() => {
-    //     fetchBookings();
-    // }, []);
+    const dispatch = useDispatch();
+    const { bookings } = useSelector(({ bookings }) => bookings);
+    const [loader, setLoader] = useState(false);
 
-    // const fetchBookings = async () => {
-    //     try {
-    //         const response = await axios.get('/bookings');
-    //         setBookings(response.data);
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // };
+    React.useEffect(() => {
+        _fetchBookings();
+    }, []);
 
-    const handleEdit = (booking) => {
-        navigation.navigate('BookingForm', { booking });
-    };
+    const _fetchBookings = useCallback(async () => {
+        setLoader(true);
+        await fetchBooking()
+            .then((res) => {
+                if (res) {
+                    dispatch(setBookings([...bookings, ...res?.results]));
+                }
+            }).catch((e) => {
+                FlashAlert({
+                    title: e?.message || 'Something went wrong. Try again later.',
+                    notIcon: true,
+                    duration: 1500,
+                    error: true,
+                });
+            })
+            .finally(() => {
+                setLoader(false);
+            });
+    }, [bookings])
+
 
     const handleDelete = async (id) => {
         // try {
@@ -50,7 +64,7 @@ export default function BookingsList({ navigation }) {
                 />
             </View>
             <View style={styles.container}>
-                <FlatList
+                {bookings && bookings.length > 0 ? <FlatList
                     data={bookings}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) => (
@@ -84,7 +98,9 @@ export default function BookingsList({ navigation }) {
                             </View>
                         </View>
                     )}
-                />
+                /> : <>
+                    <Text>No Booking Available</Text>
+                </>}
 
             </View>
         </SafeAreaView>

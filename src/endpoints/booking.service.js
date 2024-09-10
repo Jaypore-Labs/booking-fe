@@ -1,9 +1,7 @@
 import axiosInstance from "../services/axios";
 
 export const fetchBooking = async () => {
-    return axiosInstance
-        .get('/bookings')
-        .then((res) => res?.data);
+    return axiosInstance.get('/bookings').then((res) => res?.data);
 };
 
 export const createBooking = async (payload) => {

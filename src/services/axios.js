@@ -20,6 +20,7 @@ axiosInstance.interceptors.request.use(async function (config) {
     const access_token = await AsyncStorage.getItem('access_token');
     if (access_token) {
         config.headers.Authorization = `Bearer ${access_token}`;
+
     }
     return config;
 });
