@@ -1,15 +1,21 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { SafeAreaView, View, Text, FlatList, Pressable, StyleSheet } from 'react-native';
+import React, { useCallback, useState } from "react";
+import {
+    SafeAreaView,
+    View,
+    Text,
+    FlatList,
+    Pressable,
+    StyleSheet,
+} from "react-native";
 import Button from "../Button";
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchBooking } from '../../endpoints/booking.service';
-import { FlashAlert } from '../FlashAlert';
-import { setBookings } from '../../store/actions/booking';
+import { useDispatch, useSelector } from "react-redux";
+import { fetchBooking } from "../../endpoints/booking.service";
+import { FlashAlert } from "../FlashAlert";
+import { setBookings } from "../../store/actions/booking";
 
 // import axios from 'axios';
 
 export default function BookingsList({ navigation }) {
-
     const dispatch = useDispatch();
     const { bookings } = useSelector(({ bookings }) => bookings);
     const [loader, setLoader] = useState(false);
@@ -25,9 +31,10 @@ export default function BookingsList({ navigation }) {
                 if (res) {
                     dispatch(setBookings([...bookings, ...res?.results]));
                 }
-            }).catch((e) => {
+            })
+            .catch((e) => {
                 FlashAlert({
-                    title: e?.message || 'Something went wrong. Try again later.',
+                    title: e?.message || "Something went wrong. Try again later.",
                     notIcon: true,
                     duration: 1500,
                     error: true,
@@ -36,8 +43,7 @@ export default function BookingsList({ navigation }) {
             .finally(() => {
                 setLoader(false);
             });
-    }, [bookings])
-
+    }, [bookings]);
 
     const handleDelete = async (id) => {
         // try {
@@ -49,7 +55,7 @@ export default function BookingsList({ navigation }) {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
             <View
                 style={{
                     // width: "100%",
@@ -64,47 +70,51 @@ export default function BookingsList({ navigation }) {
                 />
             </View>
             <View style={styles.container}>
-                {bookings && bookings.length > 0 ? <FlatList
-                    data={bookings}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={({ item }) => (
-                        <View style={styles.bookingCard}>
-                            <Text>Property Name : {item.apartmentName}</Text>
-                            <Text>Property Price : {item.price}</Text>
-                            <Text>Deposit Amount : {item.deposit}</Text>
-                            <Text>{item.description}</Text>
-                            <Text>From {item.fromDate} - To{item.toDate}</Text>
-                            <Text>Name :{item.customerName}</Text>
-                            <Text>Phone No:{item.phone}</Text>
-                            <View
-                                style={{
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                    justifyContent: "flex-end",
-                                }}
-                            >
-                                <Pressable
-                                    style={styles.button}
-                                    onPress={() => handleEdit(item)}
+                {bookings && bookings.length > 0 ? (
+                    <FlatList
+                        data={bookings}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({ item }) => (
+                            <View style={styles.bookingCard}>
+                                <Text>Property Name : {item.apartmentName}</Text>
+                                <Text>Property Price : {item.price}</Text>
+                                <Text>Deposit Amount : {item.deposit}</Text>
+                                <Text>{item.description}</Text>
+                                <Text>
+                                    From {item.fromDate} - To{item.toDate}
+                                </Text>
+                                <Text>Name :{item.customerName}</Text>
+                                <Text>Phone No:{item.phone}</Text>
+                                <View
+                                    style={{
+                                        flexDirection: "row",
+                                        alignItems: "center",
+                                        justifyContent: "flex-end",
+                                    }}
                                 >
-                                    <Text style={styles.text}>EDIT</Text>
-                                </Pressable>
-                                <Pressable
-                                    style={styles.button}
-                                    onPress={() => handleDelete(item.id)}
-                                >
-                                    <Text style={styles.text}>DEL</Text>
-                                </Pressable>
+                                    <Pressable
+                                        style={styles.button}
+                                        onPress={() => handleEdit(item)}
+                                    >
+                                        <Text style={styles.text}>EDIT</Text>
+                                    </Pressable>
+                                    <Pressable
+                                        style={styles.button}
+                                        onPress={() => handleDelete(item.id)}
+                                    >
+                                        <Text style={styles.text}>DEL</Text>
+                                    </Pressable>
+                                </View>
                             </View>
-                        </View>
-                    )}
-                /> : <>
-                    <Text>No Booking Available</Text>
-                </>}
-
+                        )}
+                    />
+                ) : (
+                    <>
+                        <Text>No Booking Available</Text>
+                    </>
+                )}
             </View>
         </SafeAreaView>
-
     );
 }
 

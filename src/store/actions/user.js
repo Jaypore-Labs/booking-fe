@@ -7,7 +7,7 @@ import {
 
 export const userLogin = (payload) => ({
     type: USER_LOGIN,
-    payload
+    payload,
 });
 export const userLogout = () => ({
     type: USER_LOGOUT,

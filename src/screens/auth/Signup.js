@@ -20,7 +20,7 @@ import styles from "./styles";
 import colors from "../../config/colors";
 import { Eye, EyeOff } from "react-native-feather";
 import { userLogout, userLogin } from "../../store/actions";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { registerUser } from "../../endpoints/auth";
 
 export default function Signup() {

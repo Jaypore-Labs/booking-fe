@@ -1,8 +1,12 @@
-import { ActivityIndicator, StyleSheet, Text, View, Dimensions } from 'react-native';
-import colors from '@src/config/colors';
+import {
+    StyleSheet,
+    Text,
+    Dimensions,
+} from "react-native";
+import colors from "@src/config/colors";
 // import { width } from '@src/config/metrices';
-import Ripple from 'react-native-material-ripple';
-const width = Math.round(Dimensions.get('window').width);
+import Ripple from "react-native-material-ripple";
+const width = Math.round(Dimensions.get("window").width);
 
 /**
  * Button component
@@ -26,13 +30,12 @@ const Button = (props) => {
                 style={{
                     fontSize: 16,
                     color: props.textColor ? props.textColor : colors.white,
-                    textAlign: 'center',
-                    fontWeight: '500',
+                    textAlign: "center",
+                    fontWeight: "500",
                 }}
             >
                 {props.title}
             </Text>
-
         </Ripple>
     );
 };
@@ -44,8 +47,8 @@ const styles = StyleSheet.create({
         padding: 13,
         backgroundColor: colors.primary,
         borderRadius: 10,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
     },
 });

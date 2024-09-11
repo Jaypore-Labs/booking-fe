@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
     SafeAreaView,
     ScrollView,
@@ -6,20 +6,18 @@ import {
     Text,
     StyleSheet,
     KeyboardAvoidingView,
-} from 'react-native';
+} from "react-native";
 import Header from "../../components/Header";
 
 export default function Notification() {
-
     const [data, setData] = useState([
-        { id: 1, message: 'Notification 1', read: false },
-        { id: 2, message: 'Notification 1', read: false },
-        { id: 3, message: 'Notification 2', read: true },
-        { id: 4, message: 'Notification 3', read: false },
-        { id: 5, message: 'Notification 3', read: true },
-        { id: 6, message: 'Notification 2', read: true },
-        { id: 7, message: 'Notification 3', read: false },
-
+        { id: 1, message: "Notification 1", read: false },
+        { id: 2, message: "Notification 1", read: false },
+        { id: 3, message: "Notification 2", read: true },
+        { id: 4, message: "Notification 3", read: false },
+        { id: 5, message: "Notification 3", read: true },
+        { id: 6, message: "Notification 2", read: true },
+        { id: 7, message: "Notification 3", read: false },
     ]);
 
     return (
@@ -31,12 +29,16 @@ export default function Notification() {
                         <View style={styles.container}>
                             <View style={styles.notifications}>
                                 <Text style={styles.date}>Today</Text>
-                                {data.map(notification => (
+                                {data.map((notification) => (
                                     <View
                                         key={notification.id}
                                         style={[
                                             styles.notificationItem,
-                                            { backgroundColor: notification.read ? 'lightblue' : '#f8f9fa' },
+                                            {
+                                                backgroundColor: notification.read
+                                                    ? "lightblue"
+                                                    : "#f8f9fa",
+                                            },
                                         ]}
                                     >
                                         <Text>{notification.message}</Text>
@@ -56,7 +58,7 @@ export default function Notification() {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
     },
     scrollView: {
         flexGrow: 1,
@@ -68,7 +70,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         marginBottom: 16,
-        textAlign: 'center',
+        textAlign: "center",
     },
     notifications: {
         marginTop: 20,
@@ -76,7 +78,7 @@ const styles = StyleSheet.create({
     notificationItem: {
         margin: 10,
         padding: 10,
-        border: '1 solid #ccc',
+        border: "1 solid #ccc",
         borderRadius: 8,
         // borderBottomWidth: 1,
         // borderBottomColor: '#ccc',

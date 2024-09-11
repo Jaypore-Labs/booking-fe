@@ -9,19 +9,25 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { NavigationContainer } from "@react-navigation/native";
-import { Login, Signup, ForgotPassword, Home, Notification, Search, Apartment } from '../screens'
+import {
+    Login,
+    Signup,
+    ForgotPassword,
+    Home,
+    Notification,
+    Search,
+    Apartment,
+} from "../screens";
 import { useUser } from "../hooks/useUser";
 import FlashMessage from "react-native-flash-message";
 import { Check } from "react-native-feather";
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from "react-redux";
 import { clearSession } from "../store/actions";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Stack = createStackNavigator();
 
 function AppNavigator() {
-
     const navigation = useNavigation();
     const routeName = navigation.getCurrentRoute()?.name;
     const { navigate } = navigation;
@@ -33,10 +39,10 @@ function AppNavigator() {
         const checkSession = async () => {
             if (user === null && isActiveSession) {
                 dispatch(clearSession());
-                const creds = await AsyncStorage.getItem('login_creds');
+                const creds = await AsyncStorage.getItem("login_creds");
                 AsyncStorage.clear();
-                if (creds) AsyncStorage.setItem('login_creds', creds);
-                navigate('Login');
+                if (creds) AsyncStorage.setItem("login_creds", creds);
+                navigate("Login");
             }
         };
         checkSession();

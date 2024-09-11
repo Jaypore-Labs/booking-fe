@@ -2,8 +2,6 @@ import { Provider } from "react-redux";
 import { store, persistor } from "./src/store";
 import { PersistGate } from "redux-persist/integration/react";
 import AppNavigator from "./src/navigation/AppNavigator";
-import "react-native-gesture-handler";
-import "react-native-reanimated";
 import { enableScreens } from "react-native-screens";
 import { UserProvider } from "./src/hooks/useUser";
 import { NavigationContainer } from "@react-navigation/native";

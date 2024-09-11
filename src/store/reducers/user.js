@@ -1,11 +1,16 @@
-import { USER_LOGIN, USER_LOGOUT, CLEAR_SESSION, RESET_USER } from "../ActionTypes";
+import {
+    USER_LOGIN,
+    USER_LOGOUT,
+    CLEAR_SESSION,
+    RESET_USER,
+} from "../ActionTypes";
 
 const INITIAL_STATE = {
     user: null,
     tokens: null,
     userId: null,
     isActiveSession: false,
-}
+};
 
 export default (state = INITIAL_STATE, action) => {
     switch (action.type) {
@@ -38,4 +43,4 @@ export default (state = INITIAL_STATE, action) => {
         default:
             return state;
     }
-}
+};

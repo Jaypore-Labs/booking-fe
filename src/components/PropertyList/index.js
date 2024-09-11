@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
     SafeAreaView,
-    ScrollView,
     View,
     Text,
     FlatList,
@@ -9,7 +8,6 @@ import {
     Pressable,
 } from "react-native";
 import Button from "../Button";
-
 
 export default function PropertiesList({ navigation }) {
     const [properties, setProperties] = useState([
@@ -90,7 +88,7 @@ export default function PropertiesList({ navigation }) {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
             <View
                 style={{
                     alignItems: "center",

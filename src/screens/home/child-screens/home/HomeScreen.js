@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import {
     SafeAreaView,
     ScrollView,
@@ -8,15 +8,10 @@ import {
     TouchableOpacity,
     StatusBar,
 } from "react-native";
-import * as Notifications from "expo-notifications";
-import {
-    registerForPushNotificationsAsync,
-    sendPushNotification,
-} from "../../../../services/notification";
+import { sendPushNotification } from "../../../../services/notification";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 import ApartmentDropdown from "../../../../components/ApartmentDropdown";
-
 
 const dummyData = [
     {
@@ -91,42 +86,6 @@ export default function HomeScreen() {
     };
 
     const selectedApt = apartments.find((item) => item.id === selectedApartment);
-
-    //testing notification
-
-    // const handlesendNotification = (msg) => {
-    //     // Send push notification to all users
-    //     if (expoPushToken) {
-    //         sendPushNotification(expoPushToken, msg);
-    //     } else {
-    //         console.log("Push token is not available");
-    //     }
-    // };
-
-    //   useEffect(() => {
-    //     registerForPushNotificationsAsync().then(
-    //       (token) => token && setExpoPushToken(token)
-    //     );
-
-    //     notificationListener.current =
-    //       Notifications.addNotificationReceivedListener((notification) => {
-    //         setNotification(notification);
-    //       });
-
-    //     responseListener.current =
-    //       Notifications.addNotificationResponseReceivedListener((response) => {
-    //         console.log(response);
-    //       });
-
-    //     return () => {
-    //       notificationListener.current &&
-    //         Notifications.removeNotificationSubscription(
-    //           notificationListener.current
-    //         );
-    //       responseListener.current &&
-    //         Notifications.removeNotificationSubscription(responseListener.current);
-    //     };
-    //   }, []);
 
     return (
         <SafeAreaView style={styles.safeArea}>

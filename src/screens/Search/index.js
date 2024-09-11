@@ -1,7 +1,6 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo } from "react";
 import {
     SafeAreaView,
-    ScrollView,
     KeyboardAvoidingView,
     View,
     Text,

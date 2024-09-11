@@ -1,11 +1,11 @@
 import axiosInstance from "../services/axios";
 
 export const fetchBooking = async () => {
-    return axiosInstance.get('/bookings').then((res) => res?.data);
+    return axiosInstance.get("/bookings").then((res) => res?.data);
 };
 
 export const createBooking = async (payload) => {
-    return axiosInstance.post('/bookings', payload).then((res) => res?.data);
+    return axiosInstance.post("/bookings", payload).then((res) => res?.data);
 };
 
 // export const updateBooking = async (id, payload) => {

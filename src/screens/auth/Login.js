@@ -6,7 +6,6 @@ import {
     View,
     Text,
     TextInput,
-    StyleSheet,
     TouchableOpacity,
     Platform,
     Pressable,
@@ -15,7 +14,6 @@ import { Formik } from "formik";
 import * as Yup from "yup";
 import styles from "./styles";
 import colors from "../../config/colors";
-import Header from "../../components/Header";
 import CustomInput from "../../components/Input";
 import Button from "../../components/Button";
 import { useNavigation } from "@react-navigation/native";
@@ -25,6 +23,8 @@ import { useDispatch } from "react-redux";
 import { userLogin, userLogout } from "../../store/actions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { loginUser } from "../../endpoints/auth";
+import { registerForPushNotificationsAsync } from "../../services/notification";
+import { addTokenToUserAccount } from "../../endpoints/notification.service";
 
 export default function Login() {
     const navigation = useNavigation();
@@ -58,6 +58,16 @@ export default function Login() {
                 AsyncStorage.setItem("access_token", res.tokens.access.token);
                 AsyncStorage.setItem("refresh_token", res.tokens.refresh.token);
                 dispatch(userLogin({ user: res.user, tokens: res.tokens }));
+
+                let expoPushToken = await AsyncStorage.getItem("expoPushToken");
+                if (!expoPushToken) {
+                    expoPushToken = await registerForPushNotificationsAsync();
+                    await AsyncStorage.setItem("expoPushToken", expoPushToken);
+                }
+
+                if (expoPushToken) {
+                    await addTokenToUserAccount(res.user.id, expoPushToken);
+                }
                 navigation.navigate("home");
             }
         } catch (error) {

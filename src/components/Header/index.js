@@ -1,7 +1,7 @@
-import { Pressable, StyleSheet, View, Text, Dimensions } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import BackSvg from '../../../resource/svgs/backSvg';
-const width = Dimensions.get('window').width;
+import { Pressable, StyleSheet, View, Text, Dimensions } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import BackSvg from "../../../resource/svgs/backSvg";
+const width = Dimensions.get("window").width;
 /**
  * Header Component
  * @param props
@@ -15,7 +15,9 @@ const Header = (props) => {
                 style={{
                     paddingHorizontal: 0,
                 }}
-                onPress={props.navigation ? props.navigation : () => navigation.goBack()}
+                onPress={
+                    props.navigation ? props.navigation : () => navigation.goBack()
+                }
             >
                 <BackSvg />
             </Pressable>
@@ -31,16 +33,16 @@ const styles = StyleSheet.create({
     header: {
         width: width,
         paddingHorizontal: 16,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
         paddingVertical: 10,
-        backgroundColor: '#fff',
+        backgroundColor: "#fff",
     },
     text: {
         fontSize: 16,
-        textTransform: 'capitalize',
-        fontWeight: '600',
+        textTransform: "capitalize",
+        fontWeight: "600",
         marginLeft: -20,
     },
 });

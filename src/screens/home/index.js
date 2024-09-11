@@ -5,13 +5,11 @@ import PropertiesPage from "./child-screens/Property";
 import BookingsPage from "./child-screens/Booking";
 import ApartmentList from "./child-screens/apartment/index";
 import MenuHeader from "../../components/MenuHeader";
-import { useNavigation } from "@react-navigation/native";
 import { useUser } from "../../hooks/useUser";
 
 const Drawer = createDrawerNavigator();
 
 export default function Home() {
-    // const navigation = useNavigation();
     const { userRole } = useUser();
     return (
         <Drawer.Navigator initialRouteName="Home">

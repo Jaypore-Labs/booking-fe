@@ -11,8 +11,6 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import CustomCheckbox from "../../../../components/Checkbox";
-
 
 const generateDates = (startDate, numDays) => {
   let dates = [];
@@ -23,7 +21,6 @@ const generateDates = (startDate, numDays) => {
   }
   return dates;
 };
-
 
 const generateDummyData = () => {
   const apartments = [];
@@ -52,13 +49,11 @@ const ApartmentList = () => {
 
   const totalPages = Math.ceil(apartments.length / rowsPerPage);
 
-
   const displayedApartments = apartments.slice(0, visibleApartments);
   const handleRowsPerPageChange = (numRows) => {
     setVisibleApartments(numRows);
     setDropdownVisible(false);
   };
-
 
   const renderApartmentRow = ({ item }) => (
     <View style={styles.apartmentRow}>
@@ -144,7 +139,10 @@ const ApartmentList = () => {
             </View>
           )}
         </View>
-        <Text style={styles.paginationText}>  1-{visibleApartments} of {apartments.length}</Text>
+        <Text style={styles.paginationText}>
+          {" "}
+          1-{visibleApartments} of {apartments.length}
+        </Text>
         <View style={styles.paginationIcons}>
           <MaterialIcons
             name="keyboard-double-arrow-left"
@@ -205,7 +203,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
     marginHorizontal: 8,
-    color: '#979797'
+    color: "#979797",
   },
   apartmentRow: {
     flexDirection: "row",
@@ -232,7 +230,7 @@ const styles = StyleSheet.create({
   },
   availabilityText: {
     fontSize: 16,
-    color: '#ffffff'
+    color: "#ffffff",
   },
   available: {
     backgroundColor: "#7b68ee",
