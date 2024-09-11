@@ -13,8 +13,6 @@ import { fetchBooking } from "../../endpoints/booking.service";
 import { FlashAlert } from "../FlashAlert";
 import { setBookings } from "../../store/actions/booking";
 
-// import axios from 'axios';
-
 export default function BookingsList({ navigation }) {
     const dispatch = useDispatch();
     const { bookings } = useSelector(({ bookings }) => bookings);
@@ -55,17 +53,11 @@ export default function BookingsList({ navigation }) {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-            <View
-                style={{
-                    // width: "100%",
-                    alignItems: "center",
-                    marginTop: 40,
-                }}
-            >
+        <SafeAreaView style={styles.safeArea}>
+            <View style={styles.addButtonContainer}>
                 <Button
                     title={"Add Booking"}
-                    style={{ backgroundColor: "#000000" }}
+                    style={styles.addButton}
                     onPress={() => navigation.navigate("BookingForm")}
                 />
             </View>
@@ -81,37 +73,29 @@ export default function BookingsList({ navigation }) {
                                 <Text>Deposit Amount : {item.deposit}</Text>
                                 <Text>{item.description}</Text>
                                 <Text>
-                                    From {item.fromDate} - To{item.toDate}
+                                    From {item.fromDate} - To {item.toDate}
                                 </Text>
-                                <Text>Name :{item.customerName}</Text>
-                                <Text>Phone No:{item.phone}</Text>
-                                <View
-                                    style={{
-                                        flexDirection: "row",
-                                        alignItems: "center",
-                                        justifyContent: "flex-end",
-                                    }}
-                                >
+                                <Text>Name : {item.customerName}</Text>
+                                <Text>Phone No: {item.phone}</Text>
+                                <View style={styles.buttonContainer}>
                                     <Pressable
                                         style={styles.button}
                                         onPress={() => handleEdit(item)}
                                     >
-                                        <Text style={styles.text}>EDIT</Text>
+                                        <Text style={styles.buttonText}>EDIT</Text>
                                     </Pressable>
                                     <Pressable
                                         style={styles.button}
                                         onPress={() => handleDelete(item.id)}
                                     >
-                                        <Text style={styles.text}>DEL</Text>
+                                        <Text style={styles.buttonText}>DEL</Text>
                                     </Pressable>
                                 </View>
                             </View>
                         )}
                     />
                 ) : (
-                    <>
-                        <Text>No Booking Available</Text>
-                    </>
+                    <Text>No Booking Available</Text>
                 )}
             </View>
         </SafeAreaView>
@@ -119,30 +103,43 @@ export default function BookingsList({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+        backgroundColor: "#fff",
+    },
+    addButtonContainer: {
+        alignItems: "center",
+        marginTop: 40,
+    },
+    addButton: {
+        backgroundColor: "#000000",
+    },
     container: {
         padding: 16,
     },
     bookingCard: {
         padding: 16,
         backgroundColor: "#E9EAEC",
-        // marginBottom: 8,
         margin: 10,
         borderRadius: 10,
         elevation: 1,
+    },
+    buttonContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-end",
     },
     button: {
         alignItems: "center",
         justifyContent: "center",
         paddingVertical: 6,
         paddingHorizontal: 15,
-        borderRadius: 4,
-        elevation: 3,
-        margin: 6,
         borderRadius: 6,
-        padding: 8,
+        margin: 6,
         backgroundColor: "#3E904A",
+        elevation: 3,
     },
-    text: {
+    buttonText: {
         fontSize: 12,
         lineHeight: 21,
         fontWeight: "bold",

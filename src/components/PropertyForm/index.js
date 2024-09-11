@@ -1,88 +1,160 @@
 import React, { useState } from "react";
-import {
-    View,
-    Text,
-    TextInput,
-    Switch,
-    StyleSheet,
-    Pressable,
-} from "react-native";
+import { View, Text, TextInput, Switch, StyleSheet, Pressable, ScrollView } from "react-native";
+import { Formik } from "formik";
+import * as Yup from "yup";
+
+
 
 export default function PropertyForm({ route, navigation }) {
     const { property } = route.params || {};
-    const [name, setName] = useState(property ? property.name : "");
-    const [price, setPrice] = useState(property ? property.price : "");
-    const [type, setType] = useState(property ? property.type : "Studio");
     const [active, setActive] = useState(property ? property.active : true);
-    const [comments, setComments] = useState(property ? property.comments : "");
 
-    const handleSubmit = () => {
-        const updatedProperty = { name, price, type, active, comments };
+    const handleSubmit = (values) => {
+        const updatedProperty = { ...values, active };
         navigation.goBack();
     };
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.labeltext}>Property Name</Text>
-            <TextInput value={name} onChangeText={setName} style={styles.input} />
+        <ScrollView contentContainerStyle={styles.container}>
+            <Formik
+                initialValues={{
+                    name: property ? property.name : "",
+                    price: property ? property.price : "",
+                    type: property ? property.type : "Studio",
+                    comments: property ? property.comments : "",
+                }}
+                validationSchema={Yup.object().shape({
+                    name: Yup.string().required("Property name is required"),
+                    price: Yup.number().required("Price is required").typeError("Price must be a number"),
+                    type: Yup.string().required("Property type is required"),
+                    comments: Yup.string().max(50, "Comments must be less than 50 characters"),
+                })}
+                onSubmit={handleSubmit}
+            >
+                {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+                    <View style={styles.form}>
+                        <Text style={styles.labeltext}>Property Name</Text>
+                        <TextInput
+                            value={values.name}
+                            onChangeText={handleChange("name")}
+                            onBlur={handleBlur("name")}
+                            style={[styles.input, touched.name && errors.name ? styles.inputError : {}]}
+                            placeholder="Enter property name"
+                            placeholderTextColor="#aaa"
+                        />
+                        {touched.name && errors.name && <Text style={styles.error}>{errors.name}</Text>}
 
-            <Text style={styles.labeltext}>Price</Text>
-            <TextInput
-                value={price}
-                onChangeText={setPrice}
-                style={styles.input}
-                keyboardType="numeric"
-            />
+                        <Text style={styles.labeltext}>Price</Text>
+                        <TextInput
+                            value={values.price}
+                            onChangeText={handleChange("price")}
+                            onBlur={handleBlur("price")}
+                            style={[styles.input, touched.price && errors.price ? styles.inputError : {}]}
+                            placeholder="Enter price"
+                            keyboardType="numeric"
+                            placeholderTextColor="#aaa"
+                        />
+                        {touched.price && errors.price && <Text style={styles.error}>{errors.price}</Text>}
 
-            <Text style={styles.labeltext}>Type</Text>
-            <TextInput value={type} onChangeText={setType} style={styles.input} />
+                        <Text style={styles.labeltext}>Type</Text>
+                        <TextInput
+                            value={values.type}
+                            onChangeText={handleChange("type")}
+                            onBlur={handleBlur("type")}
+                            style={[styles.input, touched.type && errors.type ? styles.inputError : {}]}
+                            placeholder="e.g., Studio, 1Bed, 2Bed"
+                            placeholderTextColor="#aaa"
+                        />
+                        {touched.type && errors.type && <Text style={styles.error}>{errors.type}</Text>}
 
-            <Text style={styles.labeltext}>Comments</Text>
-            <TextInput
-                value={comments}
-                onChangeText={setComments}
-                style={styles.input}
-            />
-            <Text style={styles.labeltext}>Active</Text>
-            <Switch value={active} onValueChange={setActive} />
-            <Pressable style={styles.button}>
-                <Text style={{ fontSize: 16, color: "#fff" }} onPress={handleSubmit}>
-                    Save
-                </Text>
-            </Pressable>
-        </View>
+                        <Text style={styles.labeltext}>Comments</Text>
+                        <TextInput
+                            value={values.comments}
+                            onChangeText={handleChange("comments")}
+                            onBlur={handleBlur("comments")}
+                            style={[styles.input, touched.comments && errors.comments ? styles.inputError : {}, styles.textArea]}
+                            placeholder="Add additional details (optional)"
+                            placeholderTextColor="#aaa"
+                            multiline
+                        />
+                        {touched.comments && errors.comments && <Text style={styles.error}>{errors.comments}</Text>}
+
+                        <View style={styles.switchContainer}>
+                            <Text style={styles.labeltext}>Active</Text>
+                            <Switch value={active} onValueChange={setActive} />
+                        </View>
+
+                        <Pressable style={styles.button} onPress={handleSubmit}>
+                            <Text style={styles.buttonText}>Save</Text>
+                        </Pressable>
+                    </View>
+                )}
+            </Formik>
+        </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        padding: 16,
+        padding: 20,
+        backgroundColor: "#f5f5f5",
+        flexGrow: 1,
+        justifyContent: "center",
+    },
+    form: {
         backgroundColor: "#fff",
+        borderRadius: 12,
+        padding: 20,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+        elevation: 3,
     },
     labeltext: {
         fontSize: 16,
-        fontWeight: "500",
+        fontWeight: "600",
+        marginBottom: 8,
+        color: "#333",
     },
     input: {
-        marginBottom: 8,
-        border: 1,
-        borderColor: "#D9DBDC",
         borderWidth: 1,
+        borderColor: "#D9DBDC",
+        padding: 12,
         fontSize: 14,
-        marginTop: 6,
-        padding: 10,
         borderRadius: 8,
+        marginBottom: 12,
+        backgroundColor: "#fafafa",
+    },
+    inputError: {
+        borderColor: "red",
+    },
+    textArea: {
+        height: 100,
+        textAlignVertical: "top",
+    },
+    switchContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 12,
     },
     button: {
         alignItems: "center",
         justifyContent: "center",
-        paddingVertical: 6,
-        paddingHorizontal: 10,
-        borderRadius: 4,
-        elevation: 3,
-        margin: 6,
+        paddingVertical: 14,
         borderRadius: 6,
-        padding: 8,
         backgroundColor: "#7b68ee",
+        marginTop: 20,
+    },
+    buttonText: {
+        color: "#fff",
+        fontSize: 16,
+        fontWeight: "600",
+    },
+    error: {
+        color: "red",
+        fontSize: 12,
+        marginBottom: 8,
     },
 });

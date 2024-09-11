@@ -61,19 +61,6 @@ export default function PropertiesList({ navigation }) {
         },
     ]);
 
-    // useEffect(() => {
-    //     fetchProperties();
-    // }, []);
-
-    // const fetchProperties = async () => {
-    //     try {
-    //         const response = await axios.get('/properties');
-    //         setProperties(response.data);
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // };
-
     const handleEdit = (property) => {
         navigation.navigate("PropertyForm", { property });
     };
@@ -88,16 +75,11 @@ export default function PropertiesList({ navigation }) {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-            <View
-                style={{
-                    alignItems: "center",
-                    marginTop: 40,
-                }}
-            >
+        <SafeAreaView style={styles.safeArea}>
+            <View style={styles.headerContainer}>
                 <Button
                     title={"Add Property"}
-                    style={{ backgroundColor: "#000000" }}
+                    style={styles.addButton}
                     onPress={() => navigation.navigate("PropertyForm")}
                 />
             </View>
@@ -107,26 +89,14 @@ export default function PropertiesList({ navigation }) {
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) => (
                         <View style={styles.propertyCard}>
-                            <View
-                                style={{
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                    justifyContent: "space-between",
-                                }}
-                            >
+                            <View style={styles.propertyInfoRow}>
                                 <Text style={styles.name}>{item.name}</Text>
                                 <Text style={styles.price}>
                                     {"\u20B9"}
                                     {item.price}/DAY
                                 </Text>
                             </View>
-                            <View
-                                style={{
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                    justifyContent: "flex-start",
-                                }}
-                            >
+                            <View style={styles.propertyStatusRow}>
                                 <Text style={styles.typetext}>{item.type}</Text>
                                 <Text style={styles.typetext}>
                                     {item.active ? "Active" : "Inactive"}
@@ -134,13 +104,7 @@ export default function PropertiesList({ navigation }) {
                             </View>
 
                             <Text style={styles.comments}>{item.comments}</Text>
-                            <View
-                                style={{
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                    justifyContent: "flex-end",
-                                }}
-                            >
+                            <View style={styles.buttonRow}>
                                 <Pressable
                                     style={styles.button}
                                     onPress={() => handleEdit(item)}
@@ -163,6 +127,17 @@ export default function PropertiesList({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+        backgroundColor: "#fff",
+    },
+    headerContainer: {
+        alignItems: "center",
+        marginTop: 40,
+    },
+    addButton: {
+        backgroundColor: "#000000",
+    },
     container: {
         flex: 1,
         padding: 20,
@@ -173,6 +148,11 @@ const styles = StyleSheet.create({
         margin: 10,
         borderRadius: 10,
         elevation: 1,
+    },
+    propertyInfoRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
     },
     price: {
         fontSize: 18,
@@ -193,6 +173,16 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: "grey",
     },
+    propertyStatusRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-start",
+    },
+    buttonRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-end",
+    },
     button: {
         alignItems: "center",
         justifyContent: "center",
@@ -201,8 +191,6 @@ const styles = StyleSheet.create({
         borderRadius: 4,
         elevation: 3,
         margin: 6,
-        borderRadius: 6,
-        padding: 8,
         backgroundColor: "#3E904A",
     },
     text: {

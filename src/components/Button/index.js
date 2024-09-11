@@ -4,7 +4,6 @@ import {
     Dimensions,
 } from "react-native";
 import colors from "@src/config/colors";
-// import { width } from '@src/config/metrices';
 import Ripple from "react-native-material-ripple";
 const width = Math.round(Dimensions.get("window").width);
 

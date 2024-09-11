@@ -1,5 +1,5 @@
 import { Dimensions, StyleSheet } from "react-native";
-// import colors from '@src/config/colors';
+import colors from "../../config/colors";
 
 const width = Dimensions.get("window").width;
 const height = Dimensions.get("window").height;
@@ -7,22 +7,22 @@ export default StyleSheet.create({
     wrapper: {
         width: width,
         height: height,
-        backgroundColor: "#ffffff",
+        backgroundColor: colors.white,
     },
     heading: {
         fontSize: 30,
-        color: "#010F07",
+        color: colors.text,
         fontWeight: "600",
         marginTop: 20,
         marginBottom: 8,
     },
     para: {
         fontSize: 15,
-        color: "#576570",
+        color: colors.para,
     },
     paraHighlighted: {
         fontSize: 15,
-        color: "#7b68ee",
+        color: colors.primary,
         marginLeft: 4,
         position: "absolute",
         bottom: -3,
