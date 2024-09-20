@@ -17,27 +17,21 @@ const ApartmentDropdown = ({
                     value={apartment.comments}
                     onChangeText={(text) => onCommentChange(apartment.id, text)}
                 />
-                <View style={{ alignItems: "flex-end", justifyContent: "center" }}>
+                <View style={styles.buttonContainer}>
                     <Button
                         title="Save"
                         onPress={() => onSave(apartment.id)}
-                        style={{
-                            backgroundColor: "black",
-                            width: "20%",
-                            marginTop: 8,
-                            marginBottom: 10,
-                        }}
+                        style={styles.saveButton}
                     />
                 </View>
-                <View style={{ alignItems: "center", justifyContent: "center" }}>
+                <View style={styles.centeredButtonContainer}>
                     <Button
                         title="Mark as Completed"
                         onPress={() => onComplete(apartment.id)}
                         disabled={apartment.completed}
-                        style={{ backgroundColor: "green", width: "80%" }}
+                        style={styles.completeButton}
                     />
                 </View>
-
                 {apartment.completed && (
                     <Text style={styles.completedText}>Completed</Text>
                 )}
@@ -58,10 +52,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         elevation: 3,
     },
-    apartmentLabel: {
-        fontSize: 16,
-        fontWeight: "bold",
-    },
     expandedSection: {
         marginTop: 10,
         borderTopWidth: 1,
@@ -75,6 +65,24 @@ const styles = StyleSheet.create({
         padding: 8,
         marginTop: 8,
         marginBottom: 8,
+    },
+    buttonContainer: {
+        alignItems: "flex-end",
+        justifyContent: "center",
+    },
+    saveButton: {
+        backgroundColor: "black",
+        width: "20%",
+        marginTop: 8,
+        marginBottom: 10,
+    },
+    centeredButtonContainer: {
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    completeButton: {
+        backgroundColor: "green",
+        width: "80%",
     },
     completedText: {
         color: "green",

@@ -71,6 +71,7 @@ export default function Login() {
                 navigation.navigate("home");
             }
         } catch (error) {
+            console.log(error);
             FlashAlert({
                 title: error?.message,
                 notIcon: true,

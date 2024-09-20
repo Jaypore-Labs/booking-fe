@@ -7,6 +7,7 @@ import { UserProvider } from "./src/hooks/useUser";
 import { NavigationContainer } from "@react-navigation/native";
 import { navigationRef } from "./src/utils/rootNavigation";
 
+
 enableScreens();
 
 export default function App() {

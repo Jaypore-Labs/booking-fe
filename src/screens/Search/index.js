@@ -14,12 +14,54 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 
 export default function Search() {
     const [data, setData] = useState([
-        { id: 1, name: "Apartment 101", price: 1200, type: "Room2", active: true, comments: "comment here show" },
-        { id: 2, name: "Apartment 103", price: 1500, type: "Room2", active: true, comments: "comment here show" },
-        { id: 3, name: "Apartment 104", price: 2000, type: "Room1", active: true, comments: "comment here show" },
-        { id: 4, name: "Apartment 105", price: 1800, type: "Room2", active: true, comments: "comment here show" },
-        { id: 5, name: "Apartment 106", price: 2500, type: "Room1", active: false, comments: "comment here show" },
-        { id: 6, name: "Apartment 107", price: 1700, type: "Room2", active: true, comments: "comment here show" },
+        {
+            id: 1,
+            name: "Apartment 101",
+            price: 1200,
+            type: "Room2",
+            active: true,
+            comments: "comment here show",
+        },
+        {
+            id: 2,
+            name: "Apartment 103",
+            price: 1500,
+            type: "Room2",
+            active: true,
+            comments: "comment here show",
+        },
+        {
+            id: 3,
+            name: "Apartment 104",
+            price: 2000,
+            type: "Room1",
+            active: true,
+            comments: "comment here show",
+        },
+        {
+            id: 4,
+            name: "Apartment 105",
+            price: 1800,
+            type: "Room2",
+            active: true,
+            comments: "comment here show",
+        },
+        {
+            id: 5,
+            name: "Apartment 106",
+            price: 2500,
+            type: "Room1",
+            active: false,
+            comments: "comment here show",
+        },
+        {
+            id: 6,
+            name: "Apartment 107",
+            price: 1700,
+            type: "Room2",
+            active: true,
+            comments: "comment here show",
+        },
     ]);
     const [filteredData, setFilteredData] = useState(data);
     const [searchQuery, setSearchQuery] = useState("");
@@ -36,17 +78,20 @@ export default function Search() {
         };
     };
 
-    const debouncedSearch = useMemo(() =>
-        debounce((query) => {
-            const lowercasedFilter = query.toLowerCase();
-            const filtered = data.filter(
-                (item) =>
-                    item.name.toLowerCase().includes(lowercasedFilter) ||
-                    item.price.toString().includes(lowercasedFilter) ||
-                    item.type.toLowerCase().includes(lowercasedFilter)
-            );
-            setFilteredData(filtered);
-        }, 300), [data]);
+    const debouncedSearch = useMemo(
+        () =>
+            debounce((query) => {
+                const lowercasedFilter = query.toLowerCase();
+                const filtered = data.filter(
+                    (item) =>
+                        item.name.toLowerCase().includes(lowercasedFilter) ||
+                        item.price.toString().includes(lowercasedFilter) ||
+                        item.type.toLowerCase().includes(lowercasedFilter)
+                );
+                setFilteredData(filtered);
+            }, 300),
+        [data]
+    );
 
     const handleSearch = (text) => {
         setSearchQuery(text);
@@ -77,13 +122,16 @@ export default function Search() {
                         renderItem={({ item }) => (
                             <View style={styles.card}>
                                 <Text style={styles.price}>
-                                    {"\u20B9"}{item.price}/DAY
+                                    {"\u20B9"}
+                                    {item.price}/DAY
                                 </Text>
                                 <Text style={styles.name}>{item.name}</Text>
                                 <View style={styles.cardRow}>
                                     <Icon name="bed" size={18} color="#C5C5C5" />
                                     <Text style={styles.typeText}>{item.type}</Text>
-                                    <Text style={styles.status}>{item.active ? "Active" : "Inactive"}</Text>
+                                    <Text style={styles.status}>
+                                        {item.active ? "Active" : "Inactive"}
+                                    </Text>
                                 </View>
                             </View>
                         )}

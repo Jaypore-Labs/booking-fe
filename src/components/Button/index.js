@@ -1,8 +1,4 @@
-import {
-    StyleSheet,
-    Text,
-    Dimensions,
-} from "react-native";
+import { StyleSheet, Text, Dimensions } from "react-native";
 import colors from "@src/config/colors";
 import Ripple from "react-native-material-ripple";
 const width = Math.round(Dimensions.get("window").width);

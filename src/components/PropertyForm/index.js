@@ -1,9 +1,15 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Switch, StyleSheet, Pressable, ScrollView } from "react-native";
+import {
+    View,
+    Text,
+    TextInput,
+    Switch,
+    StyleSheet,
+    Pressable,
+    ScrollView,
+} from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
-
-
 
 export default function PropertyForm({ route, navigation }) {
     const { property } = route.params || {};
@@ -25,59 +31,92 @@ export default function PropertyForm({ route, navigation }) {
                 }}
                 validationSchema={Yup.object().shape({
                     name: Yup.string().required("Property name is required"),
-                    price: Yup.number().required("Price is required").typeError("Price must be a number"),
+                    price: Yup.number()
+                        .required("Price is required")
+                        .typeError("Price must be a number"),
                     type: Yup.string().required("Property type is required"),
-                    comments: Yup.string().max(50, "Comments must be less than 50 characters"),
+                    comments: Yup.string().max(
+                        50,
+                        "Comments must be less than 50 characters"
+                    ),
                 })}
                 onSubmit={handleSubmit}
             >
-                {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+                {({
+                    handleChange,
+                    handleBlur,
+                    handleSubmit,
+                    values,
+                    errors,
+                    touched,
+                }) => (
                     <View style={styles.form}>
                         <Text style={styles.labeltext}>Property Name</Text>
                         <TextInput
                             value={values.name}
                             onChangeText={handleChange("name")}
                             onBlur={handleBlur("name")}
-                            style={[styles.input, touched.name && errors.name ? styles.inputError : {}]}
+                            style={[
+                                styles.input,
+                                touched.name && errors.name ? styles.inputError : {},
+                            ]}
                             placeholder="Enter property name"
                             placeholderTextColor="#aaa"
                         />
-                        {touched.name && errors.name && <Text style={styles.error}>{errors.name}</Text>}
+                        {touched.name && errors.name && (
+                            <Text style={styles.error}>{errors.name}</Text>
+                        )}
 
                         <Text style={styles.labeltext}>Price</Text>
                         <TextInput
                             value={values.price}
                             onChangeText={handleChange("price")}
                             onBlur={handleBlur("price")}
-                            style={[styles.input, touched.price && errors.price ? styles.inputError : {}]}
+                            style={[
+                                styles.input,
+                                touched.price && errors.price ? styles.inputError : {},
+                            ]}
                             placeholder="Enter price"
                             keyboardType="numeric"
                             placeholderTextColor="#aaa"
                         />
-                        {touched.price && errors.price && <Text style={styles.error}>{errors.price}</Text>}
+                        {touched.price && errors.price && (
+                            <Text style={styles.error}>{errors.price}</Text>
+                        )}
 
                         <Text style={styles.labeltext}>Type</Text>
                         <TextInput
                             value={values.type}
                             onChangeText={handleChange("type")}
                             onBlur={handleBlur("type")}
-                            style={[styles.input, touched.type && errors.type ? styles.inputError : {}]}
+                            style={[
+                                styles.input,
+                                touched.type && errors.type ? styles.inputError : {},
+                            ]}
                             placeholder="e.g., Studio, 1Bed, 2Bed"
                             placeholderTextColor="#aaa"
                         />
-                        {touched.type && errors.type && <Text style={styles.error}>{errors.type}</Text>}
+                        {touched.type && errors.type && (
+                            <Text style={styles.error}>{errors.type}</Text>
+                        )}
 
                         <Text style={styles.labeltext}>Comments</Text>
                         <TextInput
                             value={values.comments}
                             onChangeText={handleChange("comments")}
                             onBlur={handleBlur("comments")}
-                            style={[styles.input, touched.comments && errors.comments ? styles.inputError : {}, styles.textArea]}
+                            style={[
+                                styles.input,
+                                touched.comments && errors.comments ? styles.inputError : {},
+                                styles.textArea,
+                            ]}
                             placeholder="Add additional details (optional)"
                             placeholderTextColor="#aaa"
                             multiline
                         />
-                        {touched.comments && errors.comments && <Text style={styles.error}>{errors.comments}</Text>}
+                        {touched.comments && errors.comments && (
+                            <Text style={styles.error}>{errors.comments}</Text>
+                        )}
 
                         <View style={styles.switchContainer}>
                             <Text style={styles.labeltext}>Active</Text>

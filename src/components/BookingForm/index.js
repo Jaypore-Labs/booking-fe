@@ -1,6 +1,15 @@
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { View, Text, TextInput, Button, Pressable, StyleSheet, Platform, ScrollView } from "react-native";
+import {
+    View,
+    Text,
+    TextInput,
+    Button,
+    Pressable,
+    StyleSheet,
+    Platform,
+    ScrollView,
+} from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { createBooking } from "../../endpoints/booking.service";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,12 +18,18 @@ import { FlashAlert } from "../FlashAlert";
 import { Formik } from "formik";
 import * as Yup from "yup";
 
-
 const BookingSchema = Yup.object().shape({
     apartmentId: Yup.string().required("Apartment name is required"),
-    price: Yup.number().required("Price is required").typeError("Price must be a number"),
-    deposit: Yup.number().required("Deposit is required").typeError("Deposit must be a number"),
-    description: Yup.string().max(250, "Description must be less than 250 characters"),
+    price: Yup.number()
+        .required("Price is required")
+        .typeError("Price must be a number"),
+    deposit: Yup.number()
+        .required("Deposit is required")
+        .typeError("Deposit must be a number"),
+    description: Yup.string().max(
+        250,
+        "Description must be less than 250 characters"
+    ),
     customerName: Yup.string().required("Customer name is required"),
     phone: Yup.string()
         .required("Phone number is required")
@@ -28,8 +43,12 @@ export default function BookingForm({ booking, onSave }) {
     const dispatch = useDispatch();
 
     const [loader, setLoader] = useState(false);
-    const [fromDate, setFromDate] = useState(booking ? new Date(booking.fromDate) : new Date());
-    const [toDate, setToDate] = useState(booking ? new Date(booking.toDate) : new Date());
+    const [fromDate, setFromDate] = useState(
+        booking ? new Date(booking.fromDate) : new Date()
+    );
+    const [toDate, setToDate] = useState(
+        booking ? new Date(booking.toDate) : new Date()
+    );
     const [showFromDatePicker, setShowFromDatePicker] = useState(false);
     const [showToDatePicker, setShowToDatePicker] = useState(false);
 
@@ -81,39 +100,63 @@ export default function BookingForm({ booking, onSave }) {
                 validationSchema={BookingSchema}
                 onSubmit={_createBooking}
             >
-                {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+                {({
+                    handleChange,
+                    handleBlur,
+                    handleSubmit,
+                    values,
+                    errors,
+                    touched,
+                }) => (
                     <View style={styles.form}>
                         <Text style={styles.label}>Apartment Name</Text>
                         <TextInput
                             value={values.apartmentId}
                             onChangeText={handleChange("apartmentId")}
                             onBlur={handleBlur("apartmentId")}
-                            style={[styles.input, touched.apartmentId && errors.apartmentId ? styles.inputError : {}]}
+                            style={[
+                                styles.input,
+                                touched.apartmentId && errors.apartmentId
+                                    ? styles.inputError
+                                    : {},
+                            ]}
                             placeholder="Enter apartment name"
                         />
-                        {touched.apartmentId && errors.apartmentId && <Text style={styles.error}>{errors.apartmentId}</Text>}
+                        {touched.apartmentId && errors.apartmentId && (
+                            <Text style={styles.error}>{errors.apartmentId}</Text>
+                        )}
 
                         <Text style={styles.label}>Price</Text>
                         <TextInput
                             value={values.price}
                             onChangeText={handleChange("price")}
                             onBlur={handleBlur("price")}
-                            style={[styles.input, touched.price && errors.price ? styles.inputError : {}]}
+                            style={[
+                                styles.input,
+                                touched.price && errors.price ? styles.inputError : {},
+                            ]}
                             keyboardType="numeric"
                             placeholder="Enter price"
                         />
-                        {touched.price && errors.price && <Text style={styles.error}>{errors.price}</Text>}
+                        {touched.price && errors.price && (
+                            <Text style={styles.error}>{errors.price}</Text>
+                        )}
 
                         <Text style={styles.label}>Deposit</Text>
                         <TextInput
                             value={values.deposit}
                             onChangeText={handleChange("deposit")}
                             onBlur={handleBlur("deposit")}
-                            style={[styles.input, touched.deposit && errors.deposit ? styles.inputError : {}]}
+                            style={[
+                                styles.input,
+                                touched.deposit && errors.deposit ? styles.inputError : {},
+                            ]}
                             keyboardType="numeric"
                             placeholder="Enter deposit"
                         />
-                        {touched.deposit && errors.deposit && <Text style={styles.error}>{errors.deposit}</Text>}
+                        {touched.deposit && errors.deposit && (
+                            <Text style={styles.error}>{errors.deposit}</Text>
+                        )}
 
                         <Text style={styles.label}>Description</Text>
                         <TextInput
@@ -124,10 +167,15 @@ export default function BookingForm({ booking, onSave }) {
                             placeholder="Enter description"
                             multiline
                         />
-                        {touched.description && errors.description && <Text style={styles.error}>{errors.description}</Text>}
+                        {touched.description && errors.description && (
+                            <Text style={styles.error}>{errors.description}</Text>
+                        )}
 
                         <Text style={styles.label}>From Date</Text>
-                        <Pressable onPress={() => setShowFromDatePicker(true)} style={styles.dateButton}>
+                        <Pressable
+                            onPress={() => setShowFromDatePicker(true)}
+                            style={styles.dateButton}
+                        >
                             <Text style={styles.dateText}>{fromDate.toDateString()}</Text>
                         </Pressable>
                         {showFromDatePicker && (
@@ -143,7 +191,10 @@ export default function BookingForm({ booking, onSave }) {
                         )}
 
                         <Text style={styles.label}>To Date</Text>
-                        <Pressable onPress={() => setShowToDatePicker(true)} style={styles.dateButton}>
+                        <Pressable
+                            onPress={() => setShowToDatePicker(true)}
+                            style={styles.dateButton}
+                        >
                             <Text style={styles.dateText}>{toDate.toDateString()}</Text>
                         </Pressable>
                         {showToDatePicker && (
@@ -163,21 +214,33 @@ export default function BookingForm({ booking, onSave }) {
                             value={values.customerName}
                             onChangeText={handleChange("customerName")}
                             onBlur={handleBlur("customerName")}
-                            style={[styles.input, touched.customerName && errors.customerName ? styles.inputError : {}]}
+                            style={[
+                                styles.input,
+                                touched.customerName && errors.customerName
+                                    ? styles.inputError
+                                    : {},
+                            ]}
                             placeholder="Enter customer name"
                         />
-                        {touched.customerName && errors.customerName && <Text style={styles.error}>{errors.customerName}</Text>}
+                        {touched.customerName && errors.customerName && (
+                            <Text style={styles.error}>{errors.customerName}</Text>
+                        )}
 
                         <Text style={styles.label}>Phone</Text>
                         <TextInput
                             value={values.phone}
                             onChangeText={handleChange("phone")}
                             onBlur={handleBlur("phone")}
-                            style={[styles.input, touched.phone && errors.phone ? styles.inputError : {}]}
+                            style={[
+                                styles.input,
+                                touched.phone && errors.phone ? styles.inputError : {},
+                            ]}
                             keyboardType="phone-pad"
                             placeholder="Enter phone number"
                         />
-                        {touched.phone && errors.phone && <Text style={styles.error}>{errors.phone}</Text>}
+                        {touched.phone && errors.phone && (
+                            <Text style={styles.error}>{errors.phone}</Text>
+                        )}
 
                         <Pressable onPress={handleSubmit} style={styles.button}>
                             <Text style={styles.buttonText}>Save</Text>

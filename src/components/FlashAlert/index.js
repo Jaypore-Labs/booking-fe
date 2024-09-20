@@ -1,5 +1,6 @@
 import { showMessage } from "react-native-flash-message";
 
+
 export const FlashAlert = (props) => {
     showMessage({
         duration: props.duration ? props.duration : 3000,
@@ -13,3 +14,5 @@ export const FlashAlert = (props) => {
         error: props.error ? props.error : false,
     });
 };
+
+
