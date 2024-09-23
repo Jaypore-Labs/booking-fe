@@ -47,6 +47,7 @@ export default function Signup() {
             name: values.username,
             email: values.email,
             password: values.password,
+            role: "admin",
         })
             .then(async (res) => {
                 if (res) {

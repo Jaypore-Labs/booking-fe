@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import Button from "../Button";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchBooking } from "../../endpoints/booking.service";
+import { fetchBooking, deleteBooking } from "../../endpoints/booking.service";
 import { FlashAlert } from "../FlashAlert";
 import { setBookings } from "../../store/actions/booking";
 
@@ -43,13 +43,25 @@ export default function BookingsList({ navigation }) {
             });
     }, [bookings]);
 
-    const handleDelete = async (id) => {
-        // try {
-        //     await axios.delete(`/bookings/${id}`);
-        //     fetchBookings();
-        // } catch (error) {
-        //     console.error(error);
-        // }
+    const updateBooking = (item) => {
+        navigation.navigate("BookingForm", { booking: item });
+    };
+
+    const _deleteBooking = async (id) => {
+        try {
+            await deleteBooking(id);
+            FlashAlert({
+                title: "Booking deleted successfully",
+                duration: 1500,
+                error: false,
+            });
+            _fetchBookings();
+        } catch (error) {
+            FlashAlert({
+                title: error.message || "Error deleting booking",
+                error: true,
+            });
+        }
     };
 
     return (
@@ -80,13 +92,13 @@ export default function BookingsList({ navigation }) {
                                 <View style={styles.buttonContainer}>
                                     <Pressable
                                         style={styles.button}
-                                        onPress={() => handleEdit(item)}
+                                        onPress={() => updateBooking(item)}
                                     >
                                         <Text style={styles.buttonText}>EDIT</Text>
                                     </Pressable>
                                     <Pressable
                                         style={styles.button}
-                                        onPress={() => handleDelete(item.id)}
+                                        onPress={() => _deleteBooking(item.id)}
                                     >
                                         <Text style={styles.buttonText}>DEL</Text>
                                     </Pressable>

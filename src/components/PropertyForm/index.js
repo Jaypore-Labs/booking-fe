@@ -10,24 +10,92 @@ import {
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import {
+    createApartment,
+    updateApartment,
+} from "../../endpoints/apartment.service";
+import { setApartments } from "../../store/actions/apartment";
+import FlashAlert from "../../components/FlashAlert";
 
-export default function PropertyForm({ route, navigation }) {
-    const { property } = route.params || {};
-    const [active, setActive] = useState(property ? property.active : true);
+export default function PropertyForm() {
 
-    const handleSubmit = (values) => {
-        const updatedProperty = { ...values, active };
-        navigation.goBack();
+    const { apartments } = useSelector(({ apartments }) => apartments);
+    const navigation = useNavigation();
+    const route = useRoute();
+    const dispatch = useDispatch();
+    const { apartment } = route.params || {};
+    const [loader, setLoader] = useState(false);
+    const [isActive, setIsActive] = useState(
+        apartment ? apartment.isActive : true
+    );
+
+    const _createApartment = async (values) => {
+        setLoader(true);
+        createApartment({
+            name: values.name,
+            price: Number(values.price),
+            type: values.type,
+            isActive: isActive,
+            description: values.comments,
+        })
+            .then((res) => {
+                if (res) {
+                    dispatch(setApartments([res, ...apartment]));
+                    navigation.navigate("home");
+                    FlashAlert({ title: "Apartment created successfully" });
+                }
+            })
+            .catch((error) => {
+                FlashAlert({
+                    title: error?.message,
+                    notIcon: true,
+                    duration: 1500,
+                    error: true,
+                });
+            })
+            .finally(() => setLoader(false));
+    };
+
+    const _updateApartment = async (values) => {
+        setLoader(true);
+        updateApartment(apartment.id, {
+            name: values.name,
+            price: Number(values.price),
+            type: values.type,
+            isActive: isActive,
+            description: values.comments,
+        })
+            .then((res) => {
+                if (res) {
+                    const updatedApartments = apartments.map((item) =>
+                        item.id === res.id ? res : item
+                    );
+                    dispatch(setApartments(updatedApartments));
+                    navigation.navigate("home");
+                    FlashAlert({ title: "Apartment updated successfully" });
+                }
+            })
+            .catch((error) => {
+                FlashAlert({
+                    title: error?.message,
+                    notIcon: true,
+                    duration: 1500,
+                    error: true,
+                });
+            })
+            .finally(() => setLoader(false));
     };
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <Formik
                 initialValues={{
-                    name: property ? property.name : "",
-                    price: property ? property.price : "",
-                    type: property ? property.type : "Studio",
-                    comments: property ? property.comments : "",
+                    name: apartment ? apartment.name : "",
+                    price: apartment ? apartment.price : "",
+                    type: apartment ? apartment.type : "Studio",
+                    comments: apartment ? apartment.comments : "",
                 }}
                 validationSchema={Yup.object().shape({
                     name: Yup.string().required("Property name is required"),
@@ -40,7 +108,7 @@ export default function PropertyForm({ route, navigation }) {
                         "Comments must be less than 50 characters"
                     ),
                 })}
-                onSubmit={handleSubmit}
+                onSubmit={apartment ? _updateApartment : _createApartment}
             >
                 {({
                     handleChange,
@@ -120,7 +188,7 @@ export default function PropertyForm({ route, navigation }) {
 
                         <View style={styles.switchContainer}>
                             <Text style={styles.labeltext}>Active</Text>
-                            <Switch value={active} onValueChange={setActive} />
+                            <Switch value={isActive} onValueChange={setIsActive} />
                         </View>
 
                         <Pressable style={styles.button} onPress={handleSubmit}>

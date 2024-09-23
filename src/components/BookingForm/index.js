@@ -1,17 +1,16 @@
 import React, { useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import {
     View,
     Text,
     TextInput,
-    Button,
     Pressable,
     StyleSheet,
     Platform,
     ScrollView,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { createBooking } from "../../endpoints/booking.service";
+import { createBooking, updateBooking } from "../../endpoints/booking.service";
 import { useDispatch, useSelector } from "react-redux";
 import { setBookings } from "../../store/actions/booking";
 import { FlashAlert } from "../FlashAlert";
@@ -36,21 +35,30 @@ const BookingSchema = Yup.object().shape({
         .matches(/^[0-9]+$/, "Phone number must be digits"),
 });
 
-export default function BookingForm({ booking, onSave }) {
+export default function BookingForm() {
     const { user } = useSelector(({ user }) => user);
     const { bookings } = useSelector(({ bookings }) => bookings);
     const navigation = useNavigation();
+    const route = useRoute();
     const dispatch = useDispatch();
+    const { booking } = route.params;
 
     const [loader, setLoader] = useState(false);
     const [fromDate, setFromDate] = useState(
-        booking ? new Date(booking.fromDate) : new Date()
+        booking ? new Date(booking.checkIn) : new Date()
     );
     const [toDate, setToDate] = useState(
-        booking ? new Date(booking.toDate) : new Date()
+        booking ? new Date(booking.checkOut) : new Date()
     );
     const [showFromDatePicker, setShowFromDatePicker] = useState(false);
     const [showToDatePicker, setShowToDatePicker] = useState(false);
+
+    useEffect(() => {
+        if (booking) {
+            setFromDate(new Date(booking.checkIn));
+            setToDate(new Date(booking.checkOut));
+        }
+    }, [booking]);
 
     const _createBooking = async (values) => {
         setLoader(true);
@@ -86,6 +94,40 @@ export default function BookingForm({ booking, onSave }) {
             .finally(() => setLoader(false));
     };
 
+    const _updateBooking = async (values) => {
+        setLoader(true);
+        updateBooking(booking.id, {
+            apartmentId: values.apartmentId,
+            price: Number(values.price),
+            deposit: Number(values.deposit),
+            description: values.description,
+            checkIn: fromDate.toISOString(),
+            checkOut: toDate.toISOString(),
+            customerDetail: { name: values.customerName, phone: values.phone },
+            userId: user?.id,
+            bookedBy: user?.id,
+        })
+            .then((res) => {
+                if (res) {
+                    const updatedBookings = bookings.map((item) =>
+                        item.id === res.id ? res : item
+                    );
+                    dispatch(setBookings(updatedBookings));
+                    navigation.navigate("home");
+                    FlashAlert({ title: "Booking updated successfully" });
+                }
+            })
+            .catch((error) => {
+                FlashAlert({
+                    title: error?.message,
+                    notIcon: true,
+                    duration: 1500,
+                    error: true,
+                });
+            })
+            .finally(() => setLoader(false));
+    };
+
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <Formik
@@ -95,10 +137,10 @@ export default function BookingForm({ booking, onSave }) {
                     deposit: booking ? booking.deposit : "",
                     description: booking ? booking.description : "",
                     customerName: booking ? booking.customerName : "",
-                    phone: booking ? booking.phone : "",
+                    phone: booking ? booking.customerDetail?.phone : "",
                 }}
                 validationSchema={BookingSchema}
-                onSubmit={_createBooking}
+                onSubmit={booking ? _updateBooking : _createBooking}
             >
                 {({
                     handleChange,

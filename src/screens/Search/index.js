@@ -11,59 +11,12 @@ import {
     Platform,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import { useSelector } from "react-redux";
 
 export default function Search() {
-    const [data, setData] = useState([
-        {
-            id: 1,
-            name: "Apartment 101",
-            price: 1200,
-            type: "Room2",
-            active: true,
-            comments: "comment here show",
-        },
-        {
-            id: 2,
-            name: "Apartment 103",
-            price: 1500,
-            type: "Room2",
-            active: true,
-            comments: "comment here show",
-        },
-        {
-            id: 3,
-            name: "Apartment 104",
-            price: 2000,
-            type: "Room1",
-            active: true,
-            comments: "comment here show",
-        },
-        {
-            id: 4,
-            name: "Apartment 105",
-            price: 1800,
-            type: "Room2",
-            active: true,
-            comments: "comment here show",
-        },
-        {
-            id: 5,
-            name: "Apartment 106",
-            price: 2500,
-            type: "Room1",
-            active: false,
-            comments: "comment here show",
-        },
-        {
-            id: 6,
-            name: "Apartment 107",
-            price: 1700,
-            type: "Room2",
-            active: true,
-            comments: "comment here show",
-        },
-    ]);
-    const [filteredData, setFilteredData] = useState(data);
+
+    const { apartments } = useSelector(({ apartments }) => apartments);
+    const [filteredData, setFilteredData] = useState(apartments);
     const [searchQuery, setSearchQuery] = useState("");
 
     const debounce = (func, delay) => {
@@ -82,7 +35,7 @@ export default function Search() {
         () =>
             debounce((query) => {
                 const lowercasedFilter = query.toLowerCase();
-                const filtered = data.filter(
+                const filtered = apartments.filter(
                     (item) =>
                         item.name.toLowerCase().includes(lowercasedFilter) ||
                         item.price.toString().includes(lowercasedFilter) ||

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
     SafeAreaView,
     View,
@@ -8,70 +8,63 @@ import {
     Pressable,
 } from "react-native";
 import Button from "../Button";
+import { FlashAlert } from "../FlashAlert";
+import {
+    fetchApartment,
+    deleteApartment,
+} from "../../endpoints/apartment.service";
+import { useDispatch, useSelector } from "react-redux";
+import { setApartments } from "../../store/actions/apartment";
 
 export default function PropertiesList({ navigation }) {
-    const [properties, setProperties] = useState([
-        {
-            id: 1,
-            name: "Apartment 101",
-            price: 1500,
-            type: "Room2",
-            active: true,
-            comments: "comment here show",
-        },
-        {
-            id: 2,
-            name: "Apartment 103",
-            price: 1500,
-            type: "Room2",
-            active: true,
-            comments: "comment here show",
-        },
-        {
-            id: 3,
-            name: "Apartment 104",
-            price: 1500,
-            type: "Room1",
-            active: true,
-            comments: "comment here show",
-        },
-        {
-            id: 4,
-            name: "Apartment 105",
-            price: 1500,
-            type: "Room2",
-            active: true,
-            comments: "comment here show",
-        },
-        {
-            id: 5,
-            name: "Apartment 106",
-            price: 1500,
-            type: "Room1",
-            active: false,
-            comments: "comment here show",
-        },
-        {
-            id: 6,
-            name: "Apartment 107",
-            price: 1500,
-            type: "Room2",
-            active: true,
-            comments: "comment here show",
-        },
-    ]);
+    const dispatch = useDispatch();
+    const { apartments } = useSelector(({ apartments }) => apartments);
+    const [loader, setLoader] = useState(false);
 
-    const handleEdit = (property) => {
-        navigation.navigate("PropertyForm", { property });
+    React.useEffect(() => {
+        _fetchApartment();
+    }, []);
+
+    const _fetchApartment = useCallback(async () => {
+        setLoader(true);
+        await fetchApartment()
+            .then((res) => {
+                if (res) {
+                    dispatch(setApartments([...apartments, ...res?.results]));
+                }
+            })
+            .catch((e) => {
+                FlashAlert({
+                    title: e?.message || "Something went wrong. Try again later.",
+                    notIcon: true,
+                    duration: 1500,
+                    error: true,
+                });
+            })
+            .finally(() => {
+                setLoader(false);
+            });
+    }, [apartments]);
+
+    const updateApartment = (item) => {
+        navigation.navigate("PropertyForm", { apartment: item });
     };
 
-    const handleDelete = async (id) => {
-        // try {
-        //     await axios.delete(`/properties/${id}`);
-        //     fetchProperties();
-        // } catch (error) {
-        //     console.error(error);
-        // }
+    const _deleteApartment = async (id) => {
+        try {
+            await deleteApartment(id);
+            FlashAlert({
+                title: "Apartment deleted successfully",
+                duration: 1500,
+                error: false,
+            });
+            _fetchApartment();
+        } catch (error) {
+            FlashAlert({
+                title: error.message || "Error deleting Apartment",
+                error: true,
+            });
+        }
     };
 
     return (
@@ -85,7 +78,7 @@ export default function PropertiesList({ navigation }) {
             </View>
             <View style={styles.container}>
                 <FlatList
-                    data={properties}
+                    data={apartments}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={({ item }) => (
                         <View style={styles.propertyCard}>
@@ -107,13 +100,13 @@ export default function PropertiesList({ navigation }) {
                             <View style={styles.buttonRow}>
                                 <Pressable
                                     style={styles.button}
-                                    onPress={() => handleEdit(item)}
+                                    onPress={() => updateApartment(item)}
                                 >
                                     <Text style={styles.text}>EDIT</Text>
                                 </Pressable>
                                 <Pressable
                                     style={styles.button}
-                                    onPress={() => handleDelete(item.id)}
+                                    onPress={() => _deleteApartment(item.id)}
                                 >
                                     <Text style={styles.text}>DEL</Text>
                                 </Pressable>
