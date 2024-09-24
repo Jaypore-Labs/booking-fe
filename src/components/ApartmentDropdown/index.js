@@ -1,30 +1,52 @@
 import React from "react";
 import { View, Text, TextInput, StyleSheet } from "react-native";
 import Button from "../Button";
+import { createComment } from "../../endpoints/comment.service";
 
-const ApartmentDropdown = ({
-    apartment,
-    onCommentChange,
-    onComplete,
-    onSave,
-}) => {
+const ApartmentDropdown = ({ apartment }) => {
+    const [comment, setComment] = useState("");
+
+    const onSave = async (id) => {
+        setLoader(true);
+        createComment({
+            text: comment,
+            userId: apartment.userId,
+            postId: id,
+        })
+            .then((res) => {
+                if (res) {
+                    setComment("");
+                    FlashAlert({ title: "Comment created successfully" });
+                }
+            })
+            .catch((error) => {
+                FlashAlert({
+                    title: error?.message,
+                    notIcon: true,
+                    duration: 1500,
+                    error: true,
+                });
+            })
+            .finally(() => setLoader(false));
+    };
+
     return (
         <View style={styles.apartmentCard}>
             <View style={styles.expandedSection}>
                 <TextInput
                     style={styles.commentInput}
-                    placeholder="Write a comment..."
-                    value={apartment.comments}
-                    onChangeText={(text) => onCommentChange(apartment.id, text)}
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    placeholder="Add a comment..."
                 />
                 <View style={styles.buttonContainer}>
                     <Button
                         title="Save"
-                        onPress={() => onSave(apartment.id)}
+                        onPress={() => onSave(apartment.apartmentId)}
                         style={styles.saveButton}
                     />
                 </View>
-                <View style={styles.centeredButtonContainer}>
+                {/* <View style={styles.centeredButtonContainer}>
                     <Button
                         title="Mark as Completed"
                         onPress={() => onComplete(apartment.id)}
@@ -34,7 +56,7 @@ const ApartmentDropdown = ({
                 </View>
                 {apartment.completed && (
                     <Text style={styles.completedText}>Completed</Text>
-                )}
+                )} */}
             </View>
         </View>
     );

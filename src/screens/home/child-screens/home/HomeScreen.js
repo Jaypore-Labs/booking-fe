@@ -8,10 +8,11 @@ import {
     TouchableOpacity,
     StatusBar,
 } from "react-native";
-import { sendPushNotification } from "../../../../services/notification";
 import Icon from "react-native-vector-icons/Ionicons";
-import { useNavigation } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
 import ApartmentDropdown from "../../../../components/ApartmentDropdown";
+import { fetchBooking } from "../../endpoints/booking.service";
+import { setBookings } from "../../store/actions/booking";
 
 const dummyData = [
     {
@@ -51,31 +52,17 @@ const AvailabilityData = [
     { id: "8", name: "203", availability: true },
     { id: "9", name: "305", availability: true },
 ];
+
 const availableRooms = AvailabilityData.filter((room) => room.availability);
 
 export default function HomeScreen() {
-    const navigation = useNavigation();
-    const [apartments, setApartments] = useState(dummyData);
-    const [selectedApartment, setSelectedApartment] = useState(dummyData[0].id);
+
+    const dispatch = useDispatch();
+    const { bookings } = useSelector(({ bookings }) => bookings);
+    const [apartments, setApartments] = useState(bookings);
+    const [selectedApartment, setSelectedApartment] = useState(bookings[0].id);
     const [showInfo, setShowInfo] = useState(false);
     const [showAvailabel, setShowAvailabel] = useState(false);
-    const [expoPushToken, setExpoPushToken] = useState("");
-    const [notification, setNotification] = useState(false);
-    const notificationListener = useRef();
-    const responseListener = useRef();
-
-    const handleCommentChange = (id, text) => {
-        setApartments(
-            apartments.map((item) =>
-                item.id === id ? { ...item, comments: text } : item
-            )
-        );
-    };
-
-    const onSave = (text) => {
-        handleCommentChange();
-        sendPushNotification(expoPushToken, text);
-    };
 
     const markAsCompleted = (id) => {
         setApartments(
@@ -86,6 +73,31 @@ export default function HomeScreen() {
     };
 
     const selectedApt = apartments.find((item) => item.id === selectedApartment);
+
+    React.useEffect(() => {
+        _fetchBookings();
+    }, []);
+
+    const _fetchBookings = useCallback(async () => {
+        setLoader(true);
+        await fetchBooking()
+            .then((res) => {
+                if (res) {
+                    dispatch(setBookings([...bookings, ...res?.results]));
+                }
+            })
+            .catch((e) => {
+                FlashAlert({
+                    title: e?.message || "Something went wrong. Try again later.",
+                    notIcon: true,
+                    duration: 1500,
+                    error: true,
+                });
+            })
+            .finally(() => {
+                setLoader(false);
+            });
+    }, [bookings]);
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -113,9 +125,6 @@ export default function HomeScreen() {
                 {showInfo && (
                     <ApartmentDropdown
                         apartment={selectedApt}
-                        onCommentChange={handleCommentChange}
-                        onComplete={markAsCompleted}
-                        onSave={onSave}
                     />
                 )}
                 <TouchableOpacity

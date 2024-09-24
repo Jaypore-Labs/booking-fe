@@ -1,14 +1,28 @@
 import axiosInstance from "../services/axios";
 
-export const addTokenToUserAccount = async (userId, token) => {
+const getNotifications = (userId, sortBy, limit, page) => {
     return axiosInstance
-        .post("/notifications", { userId, token })
-        .then((res) => {
-            console.log("Token sent successfully:", token);
-            console.log("Response from server:", res.data);
-            return res?.data;
+        .get('/notification/notification', {
+            params: {
+                sortBy,
+                limit,
+                page,
+                userId,
+            },
         })
-        .catch((error) => {
-            console.error("Error sending token to backend:", error);
-        });
+        .then((res) => res.data);
 };
+
+export const createNotification = async (payload) => {
+    return axiosInstance.post("/notification", payload).then((res) => res?.data);
+};
+
+export const markNotificationsAsRead = (notificationId) => {
+    return axiosInstance.patch(`/notification/notification/${notificationId}`);
+};
+
+export const markAllAsRead = () => {
+    return axiosInstance.patch('/notification/markAllAsRead');
+};
+
+export default getNotifications;

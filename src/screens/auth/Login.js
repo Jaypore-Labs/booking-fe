@@ -24,7 +24,7 @@ import { userLogin, userLogout } from "../../store/actions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { loginUser } from "../../endpoints/auth";
 import { registerForPushNotificationsAsync } from "../../services/notification";
-import { addTokenToUserAccount } from "../../endpoints/notification.service";
+import { addTokenToUserAccount } from "../../endpoints/common.service";
 
 export default function Login() {
     const navigation = useNavigation();

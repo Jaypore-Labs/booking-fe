@@ -46,25 +46,3 @@ export async function registerForPushNotificationsAsync() {
     return token;
 }
 
-export async function sendPushNotification(expoPushToken, message) {
-    const payload = {
-        to: expoPushToken,
-        sound: "default",
-        title: "New Comment Added",
-        body: message,
-        data: { message },
-    };
-
-    const response = await fetch("https://exp.host/--/api/v2/push/send", {
-        method: "POST",
-        headers: {
-            Accept: "application/json",
-            "Accept-encoding": "gzip, deflate",
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-    });
-
-    const responseData = await response.json();
-    console.log(responseData);
-}

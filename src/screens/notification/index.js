@@ -8,17 +8,47 @@ import {
     KeyboardAvoidingView,
 } from "react-native";
 import Header from "../../components/Header";
+import getNotifications, { markNotificationAsRead } from "../../endpoints/notification.service";
 
 export default function Notification() {
-    const [data, setData] = useState([
-        { id: 1, message: "Notification 1", read: false },
-        { id: 2, message: "Notification 1", read: false },
-        { id: 3, message: "Notification 2", read: true },
-        { id: 4, message: "Notification 3", read: false },
-        { id: 5, message: "Notification 3", read: true },
-        { id: 6, message: "Notification 2", read: true },
-        { id: 7, message: "Notification 3", read: false },
-    ]);
+
+    const [notifications, setNotifications] = useState([]);
+    const [loader, setLoader] = useState(false);
+
+
+    const _fetchNotifications = async () => {
+        try {
+            setLoader(true);
+            const result = await getNotifications();
+            setNotifications(result);
+        } catch (error) {
+            FlashAlert({
+                title: e?.message || 'Something went wrong. Try again later.',
+                notIcon: true,
+                duration: 1500,
+                error: true,
+            });
+        } finally {
+            setLoader(false);
+        }
+    };
+
+    const handleNotificationClick = async (notificationId) => {
+        await markNotificationAsRead(notificationId);
+        _fetchNotifications();
+    };
+
+    useEffect(() => {
+        _fetchNotifications();
+    }, []);
+
+    useEffect(() => {
+        const subscription = Notifications.addNotificationReceivedListener(notification => {
+            setNotifications(prev => [...prev, notification]);
+        });
+
+        return () => subscription.remove();
+    }, []);
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -29,9 +59,10 @@ export default function Notification() {
                         <View style={styles.container}>
                             <View style={styles.notifications}>
                                 <Text style={styles.date}>Today</Text>
-                                {data.map((notification) => (
+                                {notifications.map((notification) => (
                                     <View
                                         key={notification.id}
+                                        onPress={() => handleNotificationClick(notification.id)}
                                         style={[
                                             styles.notificationItem,
                                             {
@@ -41,9 +72,9 @@ export default function Notification() {
                                             },
                                         ]}
                                     >
+                                        <Text>{notification.title}</Text>
                                         <Text>{notification.message}</Text>
-                                        <Text>hello how are you</Text>
-                                        <Text style={styles.timestamp}>10:31 am</Text>
+
                                     </View>
                                 ))}
                             </View>
