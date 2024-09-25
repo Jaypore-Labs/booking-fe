@@ -1,0 +1,20 @@
+const colors = {
+    primary: '#7b68ee',
+    black: '#010F07',
+    text: '#010F07',
+    white: '#ffffff',
+    para: '#576570',
+    light: '#F2F4F5',
+    disabled: '#9C9C9C',
+    secondary: '#9758FF',
+    tagBg: '#EAF2FF',
+    lightDisabled: '#F0F0F0',
+    borderColor: '#e3e3e3',
+    success: '#16C793',
+    online: '#22A45D',
+    danger: '#F1543F',
+    lightBlue: '#CCDAFF',
+    chatColor: '#F0F1F1',
+    lightGreyBorder: 'rgba(187, 194, 201, 0.9)',
+};
+export default colors;
