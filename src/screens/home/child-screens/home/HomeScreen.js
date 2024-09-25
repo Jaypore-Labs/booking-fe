@@ -11,8 +11,8 @@ import {
 import Icon from "react-native-vector-icons/Ionicons";
 import { useDispatch, useSelector } from "react-redux";
 import ApartmentDropdown from "../../../../components/ApartmentDropdown";
-import { fetchBooking } from "../../endpoints/booking.service";
-import { setBookings } from "../../store/actions/booking";
+import { fetchBooking } from "../../../../endpoints/booking.service";
+import { setBookings } from "../../../../store/actions";
 
 const dummyData = [
     {
@@ -150,7 +150,6 @@ export default function HomeScreen() {
                     </View>
                 )}
             </ScrollView>
-
             <View style={styles.bottomBox}></View>
         </SafeAreaView>
     );

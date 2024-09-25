@@ -71,9 +71,8 @@ export default function Login() {
                 navigation.navigate("home");
             }
         } catch (error) {
-            console.log(error);
             FlashAlert({
-                title: error?.message,
+                title: error?.message || "Login failed",
                 notIcon: true,
                 duration: 1500,
                 error: true,
@@ -102,7 +101,7 @@ export default function Login() {
                 <View style={styles.wrapper}>
                     {/* <Header navigation={() => navigation.navigate("onboarding")} /> */}
                     <ScrollView style={{ flex: 1, paddingHorizontal: 16 }}>
-                        <Text style={styles.heading}>Welcome to EasyBookings</Text>
+                        <Text style={styles.heading}>Welcome to Kings</Text>
                         <View style={{ width: "78%", marginBottom: 30 }}>
                             <Text>Log in via Email </Text>
                         </View>
