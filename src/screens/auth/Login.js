@@ -58,7 +58,6 @@ export default function Login() {
                 AsyncStorage.setItem("access_token", res.tokens.access.token);
                 AsyncStorage.setItem("refresh_token", res.tokens.refresh.token);
                 dispatch(userLogin({ user: res.user, tokens: res.tokens }));
-
                 let expoPushToken = await AsyncStorage.getItem("expoPushToken");
                 if (!expoPushToken) {
                     expoPushToken = await registerForPushNotificationsAsync();

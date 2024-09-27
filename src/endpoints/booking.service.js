@@ -28,3 +28,7 @@ export const deleteBooking = async (bookingId) => {
         .delete(`/bookings/${bookingId}`)
         .then((res) => res?.data);
 };
+
+export const fetchBookingById = async (bookingId) => {
+    return axiosInstance.get(`/bookings/${bookingId}`).then((res) => res?.data);
+};

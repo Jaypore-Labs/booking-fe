@@ -30,7 +30,11 @@ export default function PropertiesList({ navigation }) {
         await fetchApartment()
             .then((res) => {
                 if (res) {
-                    dispatch(setApartments([...apartments, ...res?.results]));
+                    const uniqueApartments = [
+                        ...new Map(res?.results.map((item) => [item.id, item])).values(),
+                    ];
+                    dispatch(setApartments(uniqueApartments));
+                    // dispatch(setApartments([...apartments, ...res?.results]));
                 }
             })
             .catch((e) => {
@@ -58,6 +62,10 @@ export default function PropertiesList({ navigation }) {
                 duration: 1500,
                 error: false,
             });
+            const updatedApartments = apartments.filter(
+                (apartment) => apartment.id !== id
+            );
+            dispatch(setApartments(updatedApartments));
             _fetchApartment();
         } catch (error) {
             FlashAlert({
@@ -96,7 +104,7 @@ export default function PropertiesList({ navigation }) {
                                 </Text>
                             </View>
 
-                            <Text style={styles.comments}>{item.comments}</Text>
+                            <Text style={styles.comments}>{item.description}</Text>
                             <View style={styles.buttonRow}>
                                 <Pressable
                                     style={styles.button}

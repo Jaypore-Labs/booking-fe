@@ -35,3 +35,9 @@ export const deleteApartment = async (apartmentId) => {
         .delete(`/apartments/${apartmentId}`)
         .then((res) => res?.data);
 };
+
+export const fetchApartmentById = async (apartmentId) => {
+    return axiosInstance
+        .get(`/apartments/${apartmentId}`)
+        .then((res) => res?.data);
+};

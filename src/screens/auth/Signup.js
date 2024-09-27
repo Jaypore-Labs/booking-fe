@@ -48,7 +48,6 @@ export default function Signup() {
             name: values.username,
             email: values.email,
             password: values.password,
-            role: "admin",
         })
             .then(async (res) => {
                 if (res) {
@@ -60,6 +59,7 @@ export default function Signup() {
                 }
             })
             .catch((error) => {
+                console.log(error);
                 FlashAlert({
                     title: error?.message || "Registration failed",
                     notIcon: true,

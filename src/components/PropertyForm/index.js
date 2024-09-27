@@ -16,13 +16,12 @@ import {
     createApartment,
     updateApartment,
 } from "../../endpoints/apartment.service";
-import { setApartments } from "../../store/actions/apartment";
+import { setApartments } from "../../store/actions";
 import FlashAlert from "../../components/FlashAlert";
 
 export default function PropertyForm() {
-
-    const { apartments } = useSelector(({ apartments }) => apartments);
     const navigation = useNavigation();
+    const { apartments } = useSelector(({ apartments }) => apartments);
     const route = useRoute();
     const dispatch = useDispatch();
     const { apartment } = route.params || {};
@@ -42,8 +41,8 @@ export default function PropertyForm() {
         })
             .then((res) => {
                 if (res) {
-                    dispatch(setApartments([res, ...apartment]));
-                    navigation.navigate("home");
+                    dispatch(setApartments([res, ...apartments]));
+                    navigation.navigate("PropertyList");
                     FlashAlert({ title: "Apartment created successfully" });
                 }
             })
@@ -73,7 +72,7 @@ export default function PropertyForm() {
                         item.id === res.id ? res : item
                     );
                     dispatch(setApartments(updatedApartments));
-                    navigation.navigate("home");
+                    navigation.navigate("PropertyList");
                     FlashAlert({ title: "Apartment updated successfully" });
                 }
             })

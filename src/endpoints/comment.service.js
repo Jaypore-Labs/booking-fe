@@ -1,9 +1,7 @@
 import axiosInstance from "../services/axios";
 
-export const fetchComment = async (sortBy, limit, page, apartment, userId) => {
-    return axiosInstance
-        .get("/comments")
-        .then((res) => res?.data);
+export const fetchComment = async () => {
+    return axiosInstance.get("/comments").then((res) => res?.data);
 };
 
 export const createComment = async (payload) => {

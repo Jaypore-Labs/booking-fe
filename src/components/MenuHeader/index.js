@@ -2,12 +2,15 @@ import { View, StyleSheet, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useDispatch } from "react-redux";
 import { userLogout } from "../../store/actions";
+import { RESET_APARTMENTS, RESET_BOOKINGS } from "../../store/ActionTypes";
 
 export default function MenuHeader({ navigation, title }) {
     const dispatch = useDispatch();
 
     const _logout = async () => {
         dispatch(userLogout());
+        dispatch(RESET_APARTMENTS());
+        dispatch(RESET_BOOKINGS());
         await AsyncStorage.clear();
     };
 

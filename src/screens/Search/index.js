@@ -14,7 +14,6 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import { useSelector } from "react-redux";
 
 export default function Search() {
-
     const { apartments } = useSelector(({ apartments }) => apartments);
     const [filteredData, setFilteredData] = useState(apartments);
     const [searchQuery, setSearchQuery] = useState("");
@@ -30,7 +29,6 @@ export default function Search() {
             }, delay);
         };
     };
-
     const debouncedSearch = useMemo(
         () =>
             debounce((query) => {
@@ -43,7 +41,7 @@ export default function Search() {
                 );
                 setFilteredData(filtered);
             }, 300),
-        [data]
+        [apartments]
     );
 
     const handleSearch = (text) => {

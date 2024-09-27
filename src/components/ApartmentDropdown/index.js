@@ -1,16 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, TextInput, StyleSheet } from "react-native";
 import Button from "../Button";
-import { createComment } from "../../endpoints/comment.service";
+import { useSelector } from "react-redux";
+import createComment from "../../endpoints/comment.service";
 
 const ApartmentDropdown = ({ apartment }) => {
+    const { user } = useSelector(({ user }) => user);
     const [comment, setComment] = useState("");
+    const userId = user?.userId;
+    const { loader, setLoader } = useState(false);
 
     const onSave = async (id) => {
         setLoader(true);
-        createComment({
+        await createComment({
             text: comment,
-            userId: apartment.userId,
+            userId: userId || "66f6b8547ef59f275c2faed2",
             postId: id,
         })
             .then((res) => {
@@ -20,6 +24,7 @@ const ApartmentDropdown = ({ apartment }) => {
                 }
             })
             .catch((error) => {
+                console.log(error);
                 FlashAlert({
                     title: error?.message,
                     notIcon: true,
@@ -46,7 +51,7 @@ const ApartmentDropdown = ({ apartment }) => {
                         style={styles.saveButton}
                     />
                 </View>
-                {/* <View style={styles.centeredButtonContainer}>
+                {/*<View style={styles.centeredButtonContainer}>
                     <Button
                         title="Mark as Completed"
                         onPress={() => onComplete(apartment.id)}

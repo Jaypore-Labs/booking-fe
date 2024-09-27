@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import {
     SafeAreaView,
     ScrollView,
@@ -11,7 +11,7 @@ import {
 import Icon from "react-native-vector-icons/Ionicons";
 import { useDispatch, useSelector } from "react-redux";
 import ApartmentDropdown from "../../../../components/ApartmentDropdown";
-import { fetchBooking } from "../../../../endpoints/booking.service";
+import { fetchBookingById } from "../../../../endpoints/booking.service";
 import { setBookings } from "../../../../store/actions";
 
 const dummyData = [
@@ -56,14 +56,15 @@ const AvailabilityData = [
 const availableRooms = AvailabilityData.filter((room) => room.availability);
 
 export default function HomeScreen() {
-
     const dispatch = useDispatch();
     const { bookings } = useSelector(({ bookings }) => bookings);
+
     const [apartments, setApartments] = useState(bookings);
-    const [selectedApartment, setSelectedApartment] = useState(bookings[0].id);
+    const [selectedApartment, setSelectedApartment] = useState(
+        bookings.length > 0 ? bookings[0].id : null
+    );
     const [showInfo, setShowInfo] = useState(false);
     const [showAvailabel, setShowAvailabel] = useState(false);
-
     const markAsCompleted = (id) => {
         setApartments(
             apartments.map((item) =>
@@ -71,33 +72,25 @@ export default function HomeScreen() {
             )
         );
     };
-
+    const [selectedBooking, setSelectedBooking] = useState(null);
     const selectedApt = apartments.find((item) => item.id === selectedApartment);
 
-    React.useEffect(() => {
-        _fetchBookings();
-    }, []);
 
-    const _fetchBookings = useCallback(async () => {
-        setLoader(true);
-        await fetchBooking()
-            .then((res) => {
-                if (res) {
-                    dispatch(setBookings([...bookings, ...res?.results]));
-                }
-            })
-            .catch((e) => {
-                FlashAlert({
-                    title: e?.message || "Something went wrong. Try again later.",
-                    notIcon: true,
-                    duration: 1500,
-                    error: true,
-                });
-            })
-            .finally(() => {
-                setLoader(false);
-            });
-    }, [bookings]);
+    const bookingId = "66f6a7d7d30ac72fa4ca03a4";
+
+    const _fetchBookingById = async (id) => {
+        try {
+            const bookingData = await fetchBookingById(id);
+            setSelectedBooking(bookingData);
+        } catch (error) {
+            console.error("Error fetching booking details:", error);
+        }
+    };
+
+    useEffect(() => {
+        _fetchBookingById(bookingId);
+        console.log(selectedBooking);
+    }, []);
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -113,7 +106,9 @@ export default function HomeScreen() {
                 >
                     <View style={styles.dropdownHeader}>
                         <Text style={styles.dropdownText}>
-                            Apt 102 checkout 10:00 / checkin 15:00
+                            {selectedBooking
+                                ? `Apt ${selectedBooking.apartmentId} checkout ${selectedBooking.checkOut} / checkin ${selectedBooking.checkIn}`
+                                : "Loading..."}
                         </Text>
                         <Icon
                             name={showInfo ? "chevron-up" : "chevron-down"}
@@ -122,11 +117,7 @@ export default function HomeScreen() {
                         />
                     </View>
                 </TouchableOpacity>
-                {showInfo && (
-                    <ApartmentDropdown
-                        apartment={selectedApt}
-                    />
-                )}
+                {showInfo && <ApartmentDropdown apartment={selectedBooking} />}
                 <TouchableOpacity
                     onPress={() => setShowAvailabel(!showAvailabel)}
                     style={[styles.dropdownBox, { backgroundColor: "#fff" }]}

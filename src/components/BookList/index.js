@@ -10,6 +10,7 @@ import {
 import Button from "../Button";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchBooking, deleteBooking } from "../../endpoints/booking.service";
+import { fetchApartmentById } from "../../endpoints/apartment.service";
 import { FlashAlert } from "../FlashAlert";
 import { setBookings } from "../../store/actions/booking";
 
@@ -17,17 +18,40 @@ export default function BookingsList({ navigation }) {
     const dispatch = useDispatch();
     const { bookings } = useSelector(({ bookings }) => bookings);
     const [loader, setLoader] = useState(false);
+    const [apartments, setApartments] = useState({});
 
     React.useEffect(() => {
         _fetchBookings();
     }, []);
 
+    const getApartmentName = async (apartmentId) => {
+        if (!apartments[apartmentId]) {
+            try {
+                const apartment = await fetchApartmentById(apartmentId);
+                setApartments((prev) => ({
+                    ...prev,
+                    [apartmentId]: apartment.name,
+                }));
+            } catch (error) {
+                console.error("Failed to fetch apartment name", error);
+            }
+        }
+    };
+
     const _fetchBookings = useCallback(async () => {
         setLoader(true);
         await fetchBooking()
-            .then((res) => {
+            .then(async (res) => {
                 if (res) {
-                    dispatch(setBookings([...bookings, ...res?.results]));
+                    const uniqueBookings = [
+                        ...new Map(res?.results.map((item) => [item.id, item])).values(),
+                    ];
+                    dispatch(setBookings(uniqueBookings));
+                    await Promise.all(
+                        uniqueBookings.map((booking) =>
+                            getApartmentName(booking.apartmentId)
+                        )
+                    );
                 }
             })
             .catch((e) => {
@@ -55,6 +79,8 @@ export default function BookingsList({ navigation }) {
                 duration: 1500,
                 error: false,
             });
+            const updatedBookings = bookings.filter((booking) => booking.id !== id);
+            dispatch(setBookings(updatedBookings));
             _fetchBookings();
         } catch (error) {
             FlashAlert({
@@ -62,6 +88,17 @@ export default function BookingsList({ navigation }) {
                 error: true,
             });
         }
+    };
+
+    const formatDate = (dateStr) => {
+        const options = {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        };
+        return new Date(dateStr).toLocaleDateString(undefined, options);
     };
 
     return (
@@ -80,15 +117,16 @@ export default function BookingsList({ navigation }) {
                         keyExtractor={(item) => item.id.toString()}
                         renderItem={({ item }) => (
                             <View style={styles.bookingCard}>
-                                <Text>Property Name : {item.apartmentName}</Text>
-                                <Text>Property Price : {item.price}</Text>
-                                <Text>Deposit Amount : {item.deposit}</Text>
-                                <Text>{item.description}</Text>
                                 <Text>
-                                    From {item.fromDate} - To {item.toDate}
+                                    Name: {apartments[item.apartmentId] || "Loading..."}
                                 </Text>
-                                <Text>Name : {item.customerName}</Text>
-                                <Text>Phone No: {item.phone}</Text>
+                                <Text>Price: {item.price}</Text>
+                                <Text>Deposit: {item.deposit}</Text>
+                                <Text>Description: {item.description}</Text>
+                                <Text>Check-In: {formatDate(item.checkIn)}</Text>
+                                <Text>Check-Out: {formatDate(item.checkOut)}</Text>
+                                <Text>Customer Name: {item.customerDetail?.name}</Text>
+                                <Text>Phone No: {item.customerDetail?.phone}</Text>
                                 <View style={styles.buttonContainer}>
                                     <Pressable
                                         style={styles.button}
