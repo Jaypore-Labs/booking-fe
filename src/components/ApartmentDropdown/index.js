@@ -2,66 +2,57 @@ import React, { useState } from "react";
 import { View, Text, TextInput, StyleSheet } from "react-native";
 import Button from "../Button";
 import { useSelector } from "react-redux";
-import createComment from "../../endpoints/comment.service";
+import { createComment } from "../../endpoints/comment.service";
+import { FlashAlert } from "../FlashAlert";
 
 const ApartmentDropdown = ({ apartment }) => {
     const { user } = useSelector(({ user }) => user);
     const [comment, setComment] = useState("");
-    const userId = user?.userId;
-    const { loader, setLoader } = useState(false);
+    const userId = user?.id;
+    const [loader, setLoader] = useState(false);
 
     const onSave = async (id) => {
         setLoader(true);
-        await createComment({
-            text: comment,
-            userId: userId || "66f6b8547ef59f275c2faed2",
-            postId: id,
-        })
-            .then((res) => {
-                if (res) {
-                    setComment("");
-                    FlashAlert({ title: "Comment created successfully" });
-                }
-            })
-            .catch((error) => {
-                console.log(error);
-                FlashAlert({
-                    title: error?.message,
-                    notIcon: true,
-                    duration: 1500,
-                    error: true,
-                });
-            })
-            .finally(() => setLoader(false));
+        try {
+            const res = await createComment({
+                text: comment,
+                userId: userId,
+                postId: id,
+            });
+            if (res) {
+                setComment("");
+                FlashAlert({ title: "Comment created successfully" });
+            }
+        } catch (error) {
+            FlashAlert({
+                title: error?.message || "Failed to create comment",
+                notIcon: true,
+                duration: 1500,
+                error: true,
+            });
+        } finally {
+            setLoader(false);
+        }
     };
 
     return (
         <View style={styles.apartmentCard}>
             <View style={styles.expandedSection}>
+                <Text>{apartment.apartmentId}</Text>
                 <TextInput
                     style={styles.commentInput}
                     value={comment}
-                    onChange={(e) => setComment(e.target.value)}
+                    onChangeText={setComment}
                     placeholder="Add a comment..."
                 />
                 <View style={styles.buttonContainer}>
                     <Button
                         title="Save"
                         onPress={() => onSave(apartment.apartmentId)}
+                        disabled={loader}
                         style={styles.saveButton}
                     />
                 </View>
-                {/*<View style={styles.centeredButtonContainer}>
-                    <Button
-                        title="Mark as Completed"
-                        onPress={() => onComplete(apartment.id)}
-                        disabled={apartment.completed}
-                        style={styles.completeButton}
-                    />
-                </View>
-                {apartment.completed && (
-                    <Text style={styles.completedText}>Completed</Text>
-                )} */}
             </View>
         </View>
     );
@@ -102,18 +93,6 @@ const styles = StyleSheet.create({
         width: "20%",
         marginTop: 8,
         marginBottom: 10,
-    },
-    centeredButtonContainer: {
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    completeButton: {
-        backgroundColor: "green",
-        width: "80%",
-    },
-    completedText: {
-        color: "green",
-        marginTop: 8,
     },
 });
 

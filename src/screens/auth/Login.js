@@ -25,6 +25,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { loginUser } from "../../endpoints/auth";
 import { registerForPushNotificationsAsync } from "../../services/notification";
 import { addTokenToUserAccount } from "../../endpoints/common.service";
+import { updateUser } from "../../endpoints/user.service";
 
 export default function Login() {
     const navigation = useNavigation();
@@ -63,13 +64,13 @@ export default function Login() {
                     expoPushToken = await registerForPushNotificationsAsync();
                     await AsyncStorage.setItem("expoPushToken", expoPushToken);
                 }
-
                 if (expoPushToken) {
-                    await addTokenToUserAccount(res.user.id, expoPushToken);
+                    await updateUser(res.user.id, { expoPushToken });
                 }
                 navigation.navigate("home");
             }
         } catch (error) {
+            console.log(error);
             FlashAlert({
                 title: error?.message || "Login failed",
                 notIcon: true,

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     SafeAreaView,
     ScrollView,
@@ -8,22 +8,24 @@ import {
     KeyboardAvoidingView,
 } from "react-native";
 import Header from "../../components/Header";
-import getNotifications, { markNotificationAsRead } from "../../endpoints/notification.service";
+import * as Notifications from "expo-notifications";
+import getNotifications, {
+    markNotificationAsRead,
+} from "../../endpoints/notification.service";
+import { FlashAlert } from "../../components/FlashAlert";
 
 export default function Notification() {
-
     const [notifications, setNotifications] = useState([]);
     const [loader, setLoader] = useState(false);
-
 
     const _fetchNotifications = async () => {
         try {
             setLoader(true);
             const result = await getNotifications();
-            setNotifications(result);
+            setNotifications(result.results);
         } catch (error) {
             FlashAlert({
-                title: e?.message || 'Something went wrong. Try again later.',
+                title: e?.message || "Something went wrong. Try again later.",
                 notIcon: true,
                 duration: 1500,
                 error: true,
@@ -43,9 +45,13 @@ export default function Notification() {
     }, []);
 
     useEffect(() => {
-        const subscription = Notifications.addNotificationReceivedListener(notification => {
-            setNotifications(prev => [...prev, notification]);
-        });
+        const subscription = Notifications.addNotificationReceivedListener(
+            (notification) => {
+                if (notification && notification.request) {
+                    setNotifications((prev) => [...prev, notification.request.content]);
+                }
+            }
+        );
 
         return () => subscription.remove();
     }, []);
@@ -74,7 +80,6 @@ export default function Notification() {
                                     >
                                         <Text>{notification.title}</Text>
                                         <Text>{notification.message}</Text>
-
                                     </View>
                                 ))}
                             </View>

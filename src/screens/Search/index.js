@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import {
     SafeAreaView,
     KeyboardAvoidingView,
@@ -11,12 +11,47 @@ import {
     Platform,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import { useSelector } from "react-redux";
+import { fetchApartment } from "../../endpoints/apartment.service";
+import { useDispatch, useSelector } from "react-redux";
+import { setApartments } from "../../store/actions";
 
 export default function Search() {
-    const { apartments } = useSelector(({ apartments }) => apartments);
+    const dispatch = useDispatch();
+    const { apartments = [] } = useSelector(({ apartments }) => apartments);
     const [filteredData, setFilteredData] = useState(apartments);
     const [searchQuery, setSearchQuery] = useState("");
+    const [loader, setLoader] = useState(false);
+
+    React.useEffect(() => {
+        _fetchApartment();
+    }, []);
+
+    React.useEffect(() => {
+        setFilteredData(apartments);
+    }, [apartments]);
+
+    const _fetchApartment = useCallback(async () => {
+        setLoader(true);
+        try {
+            const res = await fetchApartment();
+            if (res) {
+                const uniqueApartments = [
+                    ...new Map(res?.results.map((item) => [item.id, item])).values(),
+                ];
+                dispatch(setApartments(uniqueApartments));
+                setFilteredData(uniqueApartments);
+            }
+        } catch (e) {
+            FlashAlert({
+                title: e?.message || "Something went wrong. Try again later.",
+                notIcon: true,
+                duration: 1500,
+                error: true,
+            });
+        } finally {
+            setLoader(false);
+        }
+    }, [dispatch]);
 
     const debounce = (func, delay) => {
         let timeoutId;
