@@ -1,23 +1,7 @@
 import axiosInstance from "../services/axios";
 
-export const fetchApartment = async (
-    sortBy,
-    limit,
-    page,
-    name,
-    description
-) => {
-    return axiosInstance
-        .get("/apartments", {
-            params: {
-                sortBy,
-                limit,
-                page,
-                name,
-                description,
-            },
-        })
-        .then((res) => res?.data);
+export const fetchApartment = async () => {
+    return axiosInstance.get("/apartments").then((res) => res?.data);
 };
 
 export const createApartment = async (payload) => {
@@ -34,4 +18,19 @@ export const deleteApartment = async (apartmentId) => {
     return axiosInstance
         .delete(`/apartments/${apartmentId}`)
         .then((res) => res?.data);
+};
+
+export const fetchApartmentById = async (apartmentId) => {
+    return axiosInstance
+        .get(`/apartments/${apartmentId}`)
+        .then((res) => res?.data);
+};
+
+export const fetchAvailableApartments = async (checkIn, checkOut) => {
+    return axiosInstance
+        .get(`/apartments/available`, { params: { checkIn, checkOut } })
+        .then((res) => res.data)
+        .catch((error) =>
+            console.error("Error fetching available apartments:", error)
+        );
 };

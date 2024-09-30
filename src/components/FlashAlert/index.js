@@ -1,18 +1,24 @@
 import { showMessage } from "react-native-flash-message";
 
-
-export const FlashAlert = (props) => {
+export const FlashAlert = ({
+    duration = 3000,
+    notIcon = false,
+    title = "Default Title",
+    action,
+    type = "success",
+    floating = true,
+    onPress,
+    color,
+    error = false,
+}) => {
     showMessage({
-        duration: props.duration ? props.duration : 3000,
-        icon: !props.notIcon,
-        message: props.title || "Default Title",
-        action: props.action,
-        type: "success",
-        floating: true,
-        onPress: props.onPress,
-        color: props.error ? "#000" : "#fff",
-        error: props.error ? props.error : false,
+        duration: duration,
+        icon: !notIcon,
+        message: title,
+        action: action,
+        type: error ? "danger" : type,
+        floating: floating,
+        onPress: onPress,
+        color: error ? "#000" : color || "#fff",
     });
 };
-
-

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
     View,
@@ -9,6 +9,7 @@ import {
     Platform,
     ScrollView,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { createBooking, updateBooking } from "../../endpoints/booking.service";
 import { useDispatch, useSelector } from "react-redux";
@@ -29,7 +30,7 @@ const BookingSchema = Yup.object().shape({
         250,
         "Description must be less than 250 characters"
     ),
-    customerName: Yup.string().required("Customer name is required"),
+    name: Yup.string().required("Customer name is required"),
     phone: Yup.string()
         .required("Phone number is required")
         .matches(/^[0-9]+$/, "Phone number must be digits"),
@@ -37,11 +38,12 @@ const BookingSchema = Yup.object().shape({
 
 export default function BookingForm() {
     const { user } = useSelector(({ user }) => user);
+    const { apartments = [] } = useSelector(({ apartments }) => apartments);
     const { bookings } = useSelector(({ bookings }) => bookings);
     const navigation = useNavigation();
     const route = useRoute();
     const dispatch = useDispatch();
-    const { booking } = route.params;
+    const { booking } = route.params || {};
 
     const [loader, setLoader] = useState(false);
     const [fromDate, setFromDate] = useState(
@@ -52,14 +54,15 @@ export default function BookingForm() {
     );
     const [showFromDatePicker, setShowFromDatePicker] = useState(false);
     const [showToDatePicker, setShowToDatePicker] = useState(false);
+    const [selectedApartmentPrice, setSelectedApartmentPrice] = useState("");
 
     useEffect(() => {
         if (booking) {
             setFromDate(new Date(booking.checkIn));
             setToDate(new Date(booking.checkOut));
+            setSelectedApartmentPrice(booking.price);
         }
     }, [booking]);
-
     const _createBooking = async (values) => {
         setLoader(true);
         createBooking({
@@ -70,7 +73,7 @@ export default function BookingForm() {
             checkIn: fromDate.toISOString(),
             checkOut: toDate.toISOString(),
             customerDetail: {
-                name: values.customerName,
+                name: values.name,
                 phone: values.phone,
             },
             userId: user?.id,
@@ -79,11 +82,12 @@ export default function BookingForm() {
             .then((res) => {
                 if (res) {
                     dispatch(setBookings([res, ...bookings]));
-                    navigation.navigate("home");
+                    navigation.navigate("BookingsList");
                     FlashAlert({ title: "Booking created successfully" });
                 }
             })
             .catch((error) => {
+                console.log(error);
                 FlashAlert({
                     title: error?.message,
                     notIcon: true,
@@ -103,7 +107,7 @@ export default function BookingForm() {
             description: values.description,
             checkIn: fromDate.toISOString(),
             checkOut: toDate.toISOString(),
-            customerDetail: { name: values.customerName, phone: values.phone },
+            customerDetail: { name: values.name, phone: values.phone },
             userId: user?.id,
             bookedBy: user?.id,
         })
@@ -113,7 +117,7 @@ export default function BookingForm() {
                         item.id === res.id ? res : item
                     );
                     dispatch(setBookings(updatedBookings));
-                    navigation.navigate("home");
+                    navigation.navigate("BookingsList");
                     FlashAlert({ title: "Booking updated successfully" });
                 }
             })
@@ -133,10 +137,10 @@ export default function BookingForm() {
             <Formik
                 initialValues={{
                     apartmentId: booking ? booking.apartmentId : "",
-                    price: booking ? booking.price : "",
-                    deposit: booking ? booking.deposit : "",
+                    price: booking ? booking.price.toString() : "",
+                    deposit: booking ? booking.deposit.toString() : "",
                     description: booking ? booking.description : "",
-                    customerName: booking ? booking.customerName : "",
+                    name: booking ? booking.customerDetail?.name : "",
                     phone: booking ? booking.customerDetail?.phone : "",
                 }}
                 validationSchema={BookingSchema}
@@ -151,7 +155,36 @@ export default function BookingForm() {
                     touched,
                 }) => (
                     <View style={styles.form}>
-                        <Text style={styles.label}>Apartment Name</Text>
+                        <Text style={styles.label}>Select Apartment</Text>
+                        <Picker
+                            selectedValue={values.apartmentId}
+                            onValueChange={(itemValue, itemIndex) => {
+                                handleChange("apartmentId")(itemValue);
+                                const selectedApartment = apartments.find(
+                                    (apartment) => apartment.id === itemValue
+                                );
+                                setSelectedApartmentPrice(
+                                    selectedApartment ? selectedApartment.price : ""
+                                );
+                                values.price = selectedApartment
+                                    ? selectedApartment.price.toString()
+                                    : ""; // Set default price from selected apartment
+                            }}
+                            style={styles.picker}
+                        >
+                            <Picker.Item label="Select an apartment" value="" />
+                            {apartments.map((apartment) => (
+                                <Picker.Item
+                                    key={apartment.id}
+                                    label={`${apartment.name} - ₹${apartment.price}`}
+                                    value={apartment.id}
+                                />
+                            ))}
+                        </Picker>
+                        {touched.apartmentId && errors.apartmentId && (
+                            <Text style={styles.error}>{errors.apartmentId}</Text>
+                        )}
+                        {/* <Text style={styles.label}>Apartment Name</Text>
                         <TextInput
                             value={values.apartmentId}
                             onChangeText={handleChange("apartmentId")}
@@ -166,11 +199,12 @@ export default function BookingForm() {
                         />
                         {touched.apartmentId && errors.apartmentId && (
                             <Text style={styles.error}>{errors.apartmentId}</Text>
-                        )}
+                        )} */}
 
                         <Text style={styles.label}>Price</Text>
+
                         <TextInput
-                            value={values.price}
+                            value={values.price || selectedApartmentPrice}
                             onChangeText={handleChange("price")}
                             onBlur={handleBlur("price")}
                             style={[
@@ -253,19 +287,17 @@ export default function BookingForm() {
 
                         <Text style={styles.label}>Customer Name</Text>
                         <TextInput
-                            value={values.customerName}
-                            onChangeText={handleChange("customerName")}
-                            onBlur={handleBlur("customerName")}
+                            value={values.name}
+                            onChangeText={handleChange("name")}
+                            onBlur={handleBlur("name")}
                             style={[
                                 styles.input,
-                                touched.customerName && errors.customerName
-                                    ? styles.inputError
-                                    : {},
+                                touched.name && errors.name ? styles.inputError : {},
                             ]}
                             placeholder="Enter customer name"
                         />
-                        {touched.customerName && errors.customerName && (
-                            <Text style={styles.error}>{errors.customerName}</Text>
+                        {touched.name && errors.name && (
+                            <Text style={styles.error}>{errors.name}</Text>
                         )}
 
                         <Text style={styles.label}>Phone</Text>

@@ -25,6 +25,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { loginUser } from "../../endpoints/auth";
 import { registerForPushNotificationsAsync } from "../../services/notification";
 import { addTokenToUserAccount } from "../../endpoints/common.service";
+import { updateUser } from "../../endpoints/user.service";
 
 export default function Login() {
     const navigation = useNavigation();
@@ -58,22 +59,20 @@ export default function Login() {
                 AsyncStorage.setItem("access_token", res.tokens.access.token);
                 AsyncStorage.setItem("refresh_token", res.tokens.refresh.token);
                 dispatch(userLogin({ user: res.user, tokens: res.tokens }));
-
                 let expoPushToken = await AsyncStorage.getItem("expoPushToken");
                 if (!expoPushToken) {
                     expoPushToken = await registerForPushNotificationsAsync();
                     await AsyncStorage.setItem("expoPushToken", expoPushToken);
                 }
-
                 if (expoPushToken) {
-                    await addTokenToUserAccount(res.user.id, expoPushToken);
+                    await updateUser(res.user.id, { expoPushToken });
                 }
                 navigation.navigate("home");
             }
         } catch (error) {
             console.log(error);
             FlashAlert({
-                title: error?.message,
+                title: error?.message || "Login failed",
                 notIcon: true,
                 duration: 1500,
                 error: true,
@@ -102,7 +101,7 @@ export default function Login() {
                 <View style={styles.wrapper}>
                     {/* <Header navigation={() => navigation.navigate("onboarding")} /> */}
                     <ScrollView style={{ flex: 1, paddingHorizontal: 16 }}>
-                        <Text style={styles.heading}>Welcome to EasyBookings</Text>
+                        <Text style={styles.heading}>Welcome to Kings</Text>
                         <View style={{ width: "78%", marginBottom: 30 }}>
                             <Text>Log in via Email </Text>
                         </View>

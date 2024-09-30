@@ -22,6 +22,7 @@ import { Eye, EyeOff } from "react-native-feather";
 import { userLogout, userLogin } from "../../store/actions";
 import { useDispatch } from "react-redux";
 import { registerUser } from "../../endpoints/auth";
+import { FlashAlert } from "../../components/FlashAlert";
 
 export default function Signup() {
     const form = useRef(null);
@@ -47,7 +48,6 @@ export default function Signup() {
             name: values.username,
             email: values.email,
             password: values.password,
-            role: "admin",
         })
             .then(async (res) => {
                 if (res) {
@@ -59,8 +59,9 @@ export default function Signup() {
                 }
             })
             .catch((error) => {
+                console.log(error);
                 FlashAlert({
-                    title: error?.message,
+                    title: error?.message || "Registration failed",
                     notIcon: true,
                     duration: 1500,
                     error: true,

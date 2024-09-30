@@ -1,28 +1,19 @@
 import axiosInstance from "../services/axios";
 
-const getNotifications = (userId, sortBy, limit, page) => {
-    return axiosInstance
-        .get('/notification/notification', {
-            params: {
-                sortBy,
-                limit,
-                page,
-                userId,
-            },
-        })
-        .then((res) => res.data);
+const getNotifications = async () => {
+    return axiosInstance.get("/notifications").then((res) => res.data);
 };
 
 export const createNotification = async (payload) => {
-    return axiosInstance.post("/notification", payload).then((res) => res?.data);
+    return axiosInstance.post("/notifications", payload).then((res) => res?.data);
 };
 
 export const markNotificationsAsRead = (notificationId) => {
-    return axiosInstance.patch(`/notification/notification/${notificationId}`);
+    return axiosInstance.patch(`/notifications/${notificationId}`);
 };
 
 export const markAllAsRead = () => {
-    return axiosInstance.patch('/notification/markAllAsRead');
+    return axiosInstance.patch("/notifications/markAllAsRead");
 };
 
 export default getNotifications;
