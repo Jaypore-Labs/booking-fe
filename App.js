@@ -6,7 +6,7 @@ import { enableScreens } from "react-native-screens";
 import { UserProvider } from "./src/hooks/useUser";
 import { NavigationContainer } from "@react-navigation/native";
 import { navigationRef } from "./src/utils/rootNavigation";
-
+import FlashMessage from "react-native-flash-message";
 
 enableScreens();
 
@@ -17,6 +17,7 @@ export default function App() {
         <UserProvider>
           <NavigationContainer ref={navigationRef}>
             <AppNavigator />
+            <FlashMessage position="top" style={{ zIndex: 9999 }} />
           </NavigationContainer>
         </UserProvider>
       </PersistGate>

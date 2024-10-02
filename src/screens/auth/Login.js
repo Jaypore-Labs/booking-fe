@@ -24,7 +24,6 @@ import { userLogin, userLogout } from "../../store/actions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { loginUser } from "../../endpoints/auth";
 import { registerForPushNotificationsAsync } from "../../services/notification";
-import { addTokenToUserAccount } from "../../endpoints/common.service";
 import { updateUser } from "../../endpoints/user.service";
 
 export default function Login() {
@@ -99,7 +98,6 @@ export default function Login() {
         <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
             <KeyboardAvoidingView style={{ flex: 1 }}>
                 <View style={styles.wrapper}>
-                    {/* <Header navigation={() => navigation.navigate("onboarding")} /> */}
                     <ScrollView style={{ flex: 1, paddingHorizontal: 16 }}>
                         <Text style={styles.heading}>Welcome to Kings</Text>
                         <View style={{ width: "78%", marginBottom: 30 }}>

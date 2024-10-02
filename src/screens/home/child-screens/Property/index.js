@@ -10,12 +10,16 @@ export default function PropertiesPage() {
             <Stack.Screen
                 name="PropertyList"
                 component={PropertyList}
-                options={{ title: "Property" }}
+                options={{
+                    title: "Property List",
+                    headerShown: true,
+                    headerLeft: () => null,
+                }}
             />
             <Stack.Screen
                 name="PropertyForm"
                 component={PropertyForm}
-                options={{ title: "Property Form" }}
+                options={{ title: "Property form" }}
             />
         </Stack.Navigator>
     );

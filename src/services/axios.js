@@ -6,7 +6,7 @@ const { dispatch } = store;
 
 const axiosInstance = axios.create({
     // baseURL: " https://kings.weboscy.com/api/v1",
-    baseURL: "http://192.168.184.168:3000/v1",
+    baseURL: "http://192.168.162.168:3000/v1",
     timeout: 30000,
     headers: {
         Accept: "application/json",
