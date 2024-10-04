@@ -39,6 +39,10 @@ const ApartmentDropdown = ({ apartment }) => {
         <View style={styles.apartmentCard}>
             <View style={styles.expandedSection}>
                 <Text>{apartment.apartmentId}</Text>
+                <Text>
+                    Check-in: {new Date(apartment.checkIn).toLocaleDateString()} |
+                    Check-out: {new Date(apartment.checkOut).toLocaleDateString()}
+                </Text>
                 <TextInput
                     style={styles.commentInput}
                     value={comment}
@@ -48,6 +52,7 @@ const ApartmentDropdown = ({ apartment }) => {
                 <View style={styles.buttonContainer}>
                     <Button
                         title="Save"
+                        loader={loader}
                         onPress={() => onSave(apartment.apartmentId)}
                         disabled={loader}
                         style={styles.saveButton}

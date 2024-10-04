@@ -102,26 +102,30 @@ export default function Search() {
                             onChangeText={handleSearch}
                         />
                     </View>
-                    <FlatList
-                        data={filteredData}
-                        keyExtractor={(item) => item.id.toString()}
-                        renderItem={({ item }) => (
-                            <View style={styles.card}>
-                                <Text style={styles.price}>
-                                    {"\u20B9"}
-                                    {item.price}/DAY
-                                </Text>
-                                <Text style={styles.name}>{item.name}</Text>
-                                <View style={styles.cardRow}>
-                                    <Icon name="bed" size={18} color="#C5C5C5" />
-                                    <Text style={styles.typeText}>{item.type}</Text>
-                                    <Text style={styles.status}>
-                                        {item.active ? "Active" : "Inactive"}
+                    {filteredData.length === 0 ? (
+                        <Text style={styles.noDataText}>No apartments available</Text>
+                    ) : (
+                        <FlatList
+                            data={filteredData}
+                            keyExtractor={(item) => item.id.toString()}
+                            renderItem={({ item }) => (
+                                <View style={styles.card}>
+                                    <Text style={styles.price}>
+                                        {"\u20B9"}
+                                        {item.price}/DAY
                                     </Text>
+                                    <Text style={styles.name}>{item.name}</Text>
+                                    <View style={styles.cardRow}>
+                                        <Icon name="bed" size={18} color="#C5C5C5" />
+                                        <Text style={styles.typeText}>{item.type}</Text>
+                                        <Text style={styles.status}>
+                                            {item.active ? "Active" : "Inactive"}
+                                        </Text>
+                                    </View>
                                 </View>
-                            </View>
-                        )}
-                    />
+                            )}
+                        />
+                    )}
                 </View>
             </KeyboardAvoidingView>
         </SafeAreaView>
@@ -154,6 +158,12 @@ const styles = StyleSheet.create({
     input: {
         width: "80%",
         marginLeft: 6,
+    },
+    noDataText: {
+        fontSize: 16,
+        color: "red",
+        textAlign: "center",
+        marginTop: 20,
     },
     card: {
         padding: 16,

@@ -14,6 +14,7 @@ import ApartmentDropdown from "../../../../components/ApartmentDropdown";
 import { fetchAvailableApartments } from "../../../../endpoints/apartment.service";
 import { fetchBookingsByUserId } from "../../../../endpoints/booking.service";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import Button from "../../../../components/Button";
 import { useSelector } from "react-redux";
 
 export default function HomeScreen() {
@@ -48,6 +49,7 @@ export default function HomeScreen() {
     }, [userId]);
 
     const _fetchAvailableApartments = async () => {
+        setLoader(true);
         try {
             const checkIn = checkInDate.toISOString();
             const checkOut = checkOutDate.toISOString();
@@ -55,6 +57,8 @@ export default function HomeScreen() {
             setAvailableRooms(apartments);
         } catch (error) {
             console.error("Error fetching available apartments:", error);
+        } finally {
+            setLoader(false);
         }
     };
 
@@ -100,10 +104,7 @@ export default function HomeScreen() {
                                     >
                                         <View style={styles.dropdownHeader}>
                                             <Text style={styles.dropdownText}>
-                                                Apt {booking.apartmentId} | Check-in:{" "}
-                                                {new Date(booking.checkIn).toLocaleDateString()} |
-                                                Check-out:{" "}
-                                                {new Date(booking.checkOut).toLocaleDateString()}
+                                                Apt Id-{booking.apartmentId}
                                             </Text>
                                             <Icon
                                                 name={
@@ -122,7 +123,10 @@ export default function HomeScreen() {
                                 </View>
                             ))
                         ) : (
-                            <Text>No bookings available</Text>
+                            <Text style={styles.noBookingText}>
+                                Currently, you have no booked apartments. Start exploring and
+                                book one now!
+                            </Text>
                         )}
 
                         <TouchableOpacity
@@ -130,7 +134,9 @@ export default function HomeScreen() {
                             style={[styles.dropdownBox, { backgroundColor: "#fff" }]}
                         >
                             <View style={styles.dropdownHeader}>
-                                <Text style={styles.dropdownText}>Available Rooms</Text>
+                                <Text style={styles.dropdownText}>
+                                    Find Available Apartments
+                                </Text>
                                 <Icon
                                     name={showAvailable ? "chevron-up" : "chevron-down"}
                                     size={20}
@@ -176,16 +182,19 @@ export default function HomeScreen() {
                                         />
                                     )}
                                 </View>
-
-                                <TouchableOpacity
-                                    onPress={_fetchAvailableApartments}
-                                    style={styles.fetchButton}
+                                <View
+                                    style={{
+                                        width: "100%",
+                                        alignItems: "center",
+                                        marginTop: 20,
+                                    }}
                                 >
-                                    <Text style={styles.fetchButtonText}>
-                                        Find Available Apartments
-                                    </Text>
-                                </TouchableOpacity>
-
+                                    <Button
+                                        loader={loader}
+                                        onPress={_fetchAvailableApartments}
+                                        title="Find"
+                                    />
+                                </View>
                                 <View style={styles.expandedBox}>
                                     {availableRooms.length > 0 ? (
                                         availableRooms.map((item, i) => (
@@ -233,6 +242,7 @@ const styles = StyleSheet.create({
         fontWeight: "400",
     },
     expandedBox: {
+        marginVertical: 8,
         backgroundColor: "#ffffff",
         padding: 15,
         borderRadius: 10,
@@ -241,6 +251,16 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 4,
         elevation: 5,
+    },
+    noBookingText: {
+        padding: 16,
+        textAlign: "center",
+        fontSize: 16,
+        color: "#6C757D",
+        fontWeight: "500",
+        backgroundColor: "#F8F9FA",
+        borderRadius: 8,
+        marginVertical: 20,
     },
     datePickerContainer: {
         marginVertical: 10,

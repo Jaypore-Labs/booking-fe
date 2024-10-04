@@ -31,11 +31,13 @@ export default function Signup() {
     const [focus, setFocus] = useState(false);
     const [loader, setLoader] = useState(false);
     const [secureTextEntry, setSecureTextEntry] = useState(true);
+    const [confirmSecureTextEntry, setConfirmSecureTextEntry] = useState(true);
 
     const [initialValue, setInitialValue] = useState({
         username: "",
         email: "",
         password: "",
+        confirmPassword: "",
     });
 
     const clearStore = () => {
@@ -82,7 +84,7 @@ export default function Signup() {
                             <Text style={styles.para}>
                                 Enter your details below for sign up
                                 <Pressable onPress={() => navigation.navigate("Login")}>
-                                    <Text style={styles.paraHighlighted}>
+                                    <Text style={[styles.paraHighlighted, { textDecorationLine: 'underline', color: colors.primary }]}>
                                         Already have account?
                                     </Text>
                                 </Pressable>
@@ -92,7 +94,7 @@ export default function Signup() {
                             innerRef={form}
                             initialValues={initialValue}
                             validationSchema={Yup.object().shape({
-                                username: Yup.string().required("Username is required."),
+                                username: Yup.string().required("Full Name is required."),
                                 email: Yup.string()
                                     .email("Invalid email")
                                     .required("Email is required."),
@@ -120,7 +122,7 @@ export default function Signup() {
                                             value={values.name}
                                             onChangeText={handleChange("username")}
                                             onBlur={() => setFieldTouched("username")}
-                                            placeholder="UserName"
+                                            placeholder="Full Name"
                                             autoCapitalize="none"
                                             error={touched.name && errors.name}
                                             errorMessage={touched.name && errors.name}
@@ -138,95 +140,31 @@ export default function Signup() {
                                             error={touched.email && errors.email}
                                             errorMessage={touched.email && errors.email}
                                         />
-                                        <View style={{ position: "relative" }}>
-                                            <View
-                                                style={{
-                                                    marginBottom: 8,
-                                                    marginTop: 10,
-                                                    backgroundColor: focus
-                                                        ? "rgba(0,102,255,0.08)"
-                                                        : touched.password && errors.password
-                                                            ? "rgba(241,84,63,0.12)"
-                                                            : colors.light,
-                                                    padding: Platform.OS === "ios" ? 14 : 8,
-                                                    borderRadius: 8,
-                                                    borderWidth: 0.5,
-                                                    borderColor: focus
-                                                        ? colors.primary
-                                                        : touched.password && errors.password
-                                                            ? "rgba(241,84,63,0.9)"
-                                                            : colors.light,
-                                                }}
-                                            >
-                                                <TextInput
-                                                    value={values.password}
-                                                    onChangeText={handleChange("password")}
-                                                    placeholder="Password"
-                                                    placeholderTextColor={colors.disabled}
-                                                    selectionColor={colors.primary}
-                                                    secureTextEntry={secureTextEntry}
-                                                    onFocus={() => {
-                                                        setFocus(true);
-                                                    }}
-                                                    onBlur={() => {
-                                                        setFieldTouched("password");
-                                                        setFocus(false);
-                                                    }}
-                                                    style={{
-                                                        padding: 0,
-                                                        fontSize: 14,
-                                                        flex: 1,
-                                                        color: colors.black,
-                                                    }}
-                                                />
-                                                <Pressable
-                                                    style={{
-                                                        position: "absolute",
-                                                        right: 20,
-                                                        bottom: 14,
-                                                    }}
-                                                    onPress={() => {
-                                                        setSecureTextEntry(!secureTextEntry);
-                                                    }}
-                                                >
-                                                    {secureTextEntry ? (
-                                                        <EyeOff
-                                                            stroke={colors.disabled}
-                                                            fill="none"
-                                                            width={18}
-                                                            height={18}
-                                                        />
-                                                    ) : (
-                                                        <Eye
-                                                            stroke={colors.disabled}
-                                                            fill="none"
-                                                            width={18}
-                                                            height={18}
-                                                        />
-                                                    )}
-                                                </Pressable>
-                                            </View>
-                                            {touched.password && errors.password && (
-                                                <Text
-                                                    style={{
-                                                        fontSize: 10,
-                                                        position: "absolute",
-                                                        top: 58,
-                                                        left: 4,
-                                                        color: colors.danger,
-                                                        fontSize: 14,
-                                                    }}
-                                                >
-                                                    {touched.password && errors.password}
-                                                </Text>
-                                            )}
-                                        </View>
+
+                                        <CustomInput
+                                            value={values.password}
+                                            onChangeText={handleChange("password")}
+                                            onBlur={() => setFieldTouched("password")}
+                                            placeholder="Password"
+                                            autoCapitalize="none"
+                                            secureTextEntry={secureTextEntry}
+                                            toggleSecureEntry={() =>
+                                                setSecureTextEntry(!secureTextEntry)
+                                            }
+                                            error={touched.password && errors.password}
+                                            errorMessage={touched.password && errors.password}
+                                        />
+
                                         <CustomInput
                                             value={values.confirmPassword}
                                             onChangeText={handleChange("confirmPassword")}
                                             onBlur={() => setFieldTouched("confirmPassword")}
                                             placeholder="Confirm Password"
                                             autoCapitalize="none"
+                                            secureTextEntry={confirmSecureTextEntry}
+                                            toggleSecureEntry={() =>
+                                                setConfirmSecureTextEntry(!confirmSecureTextEntry)
+                                            }
                                             error={touched.confirmPassword && errors.confirmPassword}
                                             errorMessage={
                                                 touched.confirmPassword && errors.confirmPassword
@@ -240,6 +178,7 @@ export default function Signup() {
                                             }}
                                         >
                                             <Button
+                                                loader={loader}
                                                 disabled={loader}
                                                 onPress={() => handleSubmit()}
                                                 title="Sign up"

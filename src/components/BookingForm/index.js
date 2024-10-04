@@ -8,6 +8,7 @@ import {
     StyleSheet,
     Platform,
     ScrollView,
+    SafeAreaView,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -133,58 +134,59 @@ export default function BookingForm() {
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <Formik
-                initialValues={{
-                    apartmentId: booking ? booking.apartmentId : "",
-                    price: booking ? booking.price.toString() : "",
-                    deposit: booking ? booking.deposit.toString() : "",
-                    description: booking ? booking.description : "",
-                    name: booking ? booking.customerDetail?.name : "",
-                    phone: booking ? booking.customerDetail?.phone : "",
-                }}
-                validationSchema={BookingSchema}
-                onSubmit={booking ? _updateBooking : _createBooking}
-            >
-                {({
-                    handleChange,
-                    handleBlur,
-                    handleSubmit,
-                    values,
-                    errors,
-                    touched,
-                }) => (
-                    <View style={styles.form}>
-                        <Text style={styles.label}>Select Apartment</Text>
-                        <Picker
-                            selectedValue={values.apartmentId}
-                            onValueChange={(itemValue, itemIndex) => {
-                                handleChange("apartmentId")(itemValue);
-                                const selectedApartment = apartments.find(
-                                    (apartment) => apartment.id === itemValue
-                                );
-                                setSelectedApartmentPrice(
-                                    selectedApartment ? selectedApartment.price : ""
-                                );
-                                values.price = selectedApartment
-                                    ? selectedApartment.price.toString()
-                                    : ""; // Set default price from selected apartment
-                            }}
-                            style={styles.picker}
-                        >
-                            <Picker.Item label="Select an apartment" value="" />
-                            {apartments.map((apartment) => (
-                                <Picker.Item
-                                    key={apartment.id}
-                                    label={`${apartment.name} - ₹${apartment.price}`}
-                                    value={apartment.id}
-                                />
-                            ))}
-                        </Picker>
-                        {touched.apartmentId && errors.apartmentId && (
-                            <Text style={styles.error}>{errors.apartmentId}</Text>
-                        )}
-                        {/* <Text style={styles.label}>Apartment Name</Text>
+        <SafeAreaView style={{ flex: 1 }}>
+            <ScrollView contentContainerStyle={styles.container}>
+                <Formik
+                    initialValues={{
+                        apartmentId: booking ? booking.apartmentId : "",
+                        price: booking ? booking.price.toString() : "",
+                        deposit: booking ? booking.deposit.toString() : "",
+                        description: booking ? booking.description : "",
+                        name: booking ? booking.customerDetail?.name : "",
+                        phone: booking ? booking.customerDetail?.phone : "",
+                    }}
+                    validationSchema={BookingSchema}
+                    onSubmit={booking ? _updateBooking : _createBooking}
+                >
+                    {({
+                        handleChange,
+                        handleBlur,
+                        handleSubmit,
+                        values,
+                        errors,
+                        touched,
+                    }) => (
+                        <View style={styles.form}>
+                            <Text style={styles.label}>Select Apartment</Text>
+                            <Picker
+                                selectedValue={values.apartmentId}
+                                onValueChange={(itemValue, itemIndex) => {
+                                    handleChange("apartmentId")(itemValue);
+                                    const selectedApartment = apartments.find(
+                                        (apartment) => apartment.id === itemValue
+                                    );
+                                    setSelectedApartmentPrice(
+                                        selectedApartment ? selectedApartment.price : ""
+                                    );
+                                    values.price = selectedApartment
+                                        ? selectedApartment.price.toString()
+                                        : ""; // Set default price from selected apartment
+                                }}
+                                style={styles.picker}
+                            >
+                                <Picker.Item label="Select an apartment" value="" />
+                                {apartments.map((apartment) => (
+                                    <Picker.Item
+                                        key={apartment.id}
+                                        label={`${apartment.name} - ₹${apartment.price}`}
+                                        value={apartment.id}
+                                    />
+                                ))}
+                            </Picker>
+                            {touched.apartmentId && errors.apartmentId && (
+                                <Text style={styles.error}>{errors.apartmentId}</Text>
+                            )}
+                            {/* <Text style={styles.label}>Apartment Name</Text>
                         <TextInput
                             value={values.apartmentId}
                             onChangeText={handleChange("apartmentId")}
@@ -201,128 +203,130 @@ export default function BookingForm() {
                             <Text style={styles.error}>{errors.apartmentId}</Text>
                         )} */}
 
-                        <Text style={styles.label}>Price</Text>
+                            <Text style={styles.label}>Price</Text>
 
-                        <TextInput
-                            value={values.price || selectedApartmentPrice}
-                            onChangeText={handleChange("price")}
-                            onBlur={handleBlur("price")}
-                            style={[
-                                styles.input,
-                                touched.price && errors.price ? styles.inputError : {},
-                            ]}
-                            keyboardType="numeric"
-                            placeholder="Enter price"
-                        />
-                        {touched.price && errors.price && (
-                            <Text style={styles.error}>{errors.price}</Text>
-                        )}
-
-                        <Text style={styles.label}>Deposit</Text>
-                        <TextInput
-                            value={values.deposit}
-                            onChangeText={handleChange("deposit")}
-                            onBlur={handleBlur("deposit")}
-                            style={[
-                                styles.input,
-                                touched.deposit && errors.deposit ? styles.inputError : {},
-                            ]}
-                            keyboardType="numeric"
-                            placeholder="Enter deposit"
-                        />
-                        {touched.deposit && errors.deposit && (
-                            <Text style={styles.error}>{errors.deposit}</Text>
-                        )}
-
-                        <Text style={styles.label}>Description</Text>
-                        <TextInput
-                            value={values.description}
-                            onChangeText={handleChange("description")}
-                            onBlur={handleBlur("description")}
-                            style={[styles.input, styles.textArea]}
-                            placeholder="Enter description"
-                            multiline
-                        />
-                        {touched.description && errors.description && (
-                            <Text style={styles.error}>{errors.description}</Text>
-                        )}
-
-                        <Text style={styles.label}>From Date</Text>
-                        <Pressable
-                            onPress={() => setShowFromDatePicker(true)}
-                            style={styles.dateButton}
-                        >
-                            <Text style={styles.dateText}>{fromDate.toDateString()}</Text>
-                        </Pressable>
-                        {showFromDatePicker && (
-                            <DateTimePicker
-                                value={fromDate}
-                                mode="date"
-                                display={Platform.OS === "ios" ? "spinner" : "default"}
-                                onChange={(event, selectedDate) => {
-                                    setShowFromDatePicker(false);
-                                    if (selectedDate) setFromDate(selectedDate);
-                                }}
+                            <TextInput
+                                value={values.price || selectedApartmentPrice}
+                                onChangeText={handleChange("price")}
+                                onBlur={handleBlur("price")}
+                                style={[
+                                    styles.input,
+                                    touched.price && errors.price ? styles.inputError : {},
+                                ]}
+                                keyboardType="numeric"
+                                placeholder="Enter price"
                             />
-                        )}
+                            {touched.price && errors.price && (
+                                <Text style={styles.error}>{errors.price}</Text>
+                            )}
 
-                        <Text style={styles.label}>To Date</Text>
-                        <Pressable
-                            onPress={() => setShowToDatePicker(true)}
-                            style={styles.dateButton}
-                        >
-                            <Text style={styles.dateText}>{toDate.toDateString()}</Text>
-                        </Pressable>
-                        {showToDatePicker && (
-                            <DateTimePicker
-                                value={toDate}
-                                mode="date"
-                                display={Platform.OS === "ios" ? "spinner" : "default"}
-                                onChange={(event, selectedDate) => {
-                                    setShowToDatePicker(false);
-                                    if (selectedDate) setToDate(selectedDate);
-                                }}
+                            <Text style={styles.label}>Deposit</Text>
+                            <TextInput
+                                value={values.deposit}
+                                onChangeText={handleChange("deposit")}
+                                onBlur={handleBlur("deposit")}
+                                style={[
+                                    styles.input,
+                                    touched.deposit && errors.deposit ? styles.inputError : {},
+                                ]}
+                                keyboardType="numeric"
+                                placeholder="Enter deposit"
                             />
-                        )}
+                            {touched.deposit && errors.deposit && (
+                                <Text style={styles.error}>{errors.deposit}</Text>
+                            )}
 
-                        <Text style={styles.label}>Customer Name</Text>
-                        <TextInput
-                            value={values.name}
-                            onChangeText={handleChange("name")}
-                            onBlur={handleBlur("name")}
-                            style={[
-                                styles.input,
-                                touched.name && errors.name ? styles.inputError : {},
-                            ]}
-                            placeholder="Enter customer name"
-                        />
-                        {touched.name && errors.name && (
-                            <Text style={styles.error}>{errors.name}</Text>
-                        )}
+                            <Text style={styles.label}>Description</Text>
+                            <TextInput
+                                value={values.description}
+                                onChangeText={handleChange("description")}
+                                onBlur={handleBlur("description")}
+                                style={[styles.input, styles.textArea]}
+                                placeholder="Enter description"
+                                multiline
+                            />
+                            {touched.description && errors.description && (
+                                <Text style={styles.error}>{errors.description}</Text>
+                            )}
 
-                        <Text style={styles.label}>Phone</Text>
-                        <TextInput
-                            value={values.phone}
-                            onChangeText={handleChange("phone")}
-                            onBlur={handleBlur("phone")}
-                            style={[
-                                styles.input,
-                                touched.phone && errors.phone ? styles.inputError : {},
-                            ]}
-                            keyboardType="phone-pad"
-                            placeholder="Enter phone number"
-                        />
-                        {touched.phone && errors.phone && (
-                            <Text style={styles.error}>{errors.phone}</Text>
-                        )}
+                            <Text style={styles.label}>From Date</Text>
+                            <Pressable
+                                onPress={() => setShowFromDatePicker(true)}
+                                style={styles.dateButton}
+                            >
+                                <Text style={styles.dateText}>{fromDate.toDateString()}</Text>
+                            </Pressable>
+                            {showFromDatePicker && (
+                                <DateTimePicker
+                                    value={fromDate}
+                                    mode="date"
+                                    display={Platform.OS === "ios" ? "spinner" : "default"}
+                                    onChange={(event, selectedDate) => {
+                                        setShowFromDatePicker(false);
+                                        if (selectedDate) setFromDate(selectedDate);
+                                    }}
+                                />
+                            )}
 
-                        <Pressable onPress={handleSubmit} style={styles.button}>
-                            <Text style={styles.buttonText}>Save</Text>
-                        </Pressable>
-                    </View>
-                )}
-            </Formik>
-        </ScrollView>
+                            <Text style={styles.label}>To Date</Text>
+                            <Pressable
+                                onPress={() => setShowToDatePicker(true)}
+                                style={styles.dateButton}
+                            >
+                                <Text style={styles.dateText}>{toDate.toDateString()}</Text>
+                            </Pressable>
+                            {showToDatePicker && (
+                                <DateTimePicker
+                                    value={toDate}
+                                    mode="date"
+                                    display={Platform.OS === "ios" ? "spinner" : "default"}
+                                    onChange={(event, selectedDate) => {
+                                        setShowToDatePicker(false);
+                                        if (selectedDate) setToDate(selectedDate);
+                                    }}
+                                />
+                            )}
+
+                            <Text style={styles.label}>Customer Name</Text>
+                            <TextInput
+                                value={values.name}
+                                onChangeText={handleChange("name")}
+                                onBlur={handleBlur("name")}
+                                style={[
+                                    styles.input,
+                                    touched.name && errors.name ? styles.inputError : {},
+                                ]}
+                                placeholder="Enter customer name"
+                            />
+                            {touched.name && errors.name && (
+                                <Text style={styles.error}>{errors.name}</Text>
+                            )}
+
+                            <Text style={styles.label}>Phone</Text>
+                            <TextInput
+                                value={values.phone}
+                                onChangeText={handleChange("phone")}
+                                onBlur={handleBlur("phone")}
+                                style={[
+                                    styles.input,
+                                    touched.phone && errors.phone ? styles.inputError : {},
+                                ]}
+                                keyboardType="phone-pad"
+                                placeholder="Enter phone number"
+                            />
+                            {touched.phone && errors.phone && (
+                                <Text style={styles.error}>{errors.phone}</Text>
+                            )}
+
+                            <Pressable onPress={handleSubmit} style={styles.button}>
+                                <Text style={styles.buttonText}>Save</Text>
+                            </Pressable>
+                        </View>
+                    )}
+                </Formik>
+            </ScrollView>
+        </SafeAreaView>
+
     );
 }
 
