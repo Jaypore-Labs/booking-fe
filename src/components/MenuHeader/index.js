@@ -4,7 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useDispatch } from "react-redux";
 import { userLogout } from "../../store/actions";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { RESET_APARTMENTS, RESET_BOOKINGS } from "../../store/ActionTypes";
 
 export default function MenuHeader({ title }) {
@@ -12,13 +12,11 @@ export default function MenuHeader({ title }) {
     const dispatch = useDispatch();
     const [loader, setLoader] = React.useState(false);
 
-
-
     const _LOGOUT = async () => {
         setLoader(true);
-        const creds = await AsyncStorage.getItem('login_creds');
+        const creds = await AsyncStorage.getItem("login_creds");
         await AsyncStorage.clear();
-        if (creds) AsyncStorage.setItem('login_creds', creds);
+        if (creds) AsyncStorage.setItem("login_creds", creds);
         clearStore();
         setLoader(false);
         clearStackAndGoToLogin();

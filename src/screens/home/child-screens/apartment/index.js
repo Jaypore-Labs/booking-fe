@@ -163,7 +163,7 @@ const ApartmentList = () => {
           </View>
         )}
       </View>
-      {showApt ? (
+      {(showApt && availableApt.length > 0) ? (
         <>
           <View style={styles.headerRow}>
             <Text style={styles.headerText}>Apt Name</Text>
@@ -230,7 +230,7 @@ const ApartmentList = () => {
           </View>
         </>
       ) : (
-        <Text style={{ textAlign: "center" }}>Please Select Date</Text>
+        <Text style={{ textAlign: "center" }}>Apartment not found</Text>
       )}
     </SafeAreaView>
   );

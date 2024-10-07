@@ -11,7 +11,6 @@ import colors from "@src/config/colors";
 export default function CustomInput(props) {
     const [focus, setFocus] = useState(false);
 
-
     return (
         <View style={{ position: "relative" }}>
             <View

@@ -229,7 +229,11 @@ export default function Login() {
                                                 marginTop: 20,
                                             }}
                                         >
-                                            <Button loader={loader} onPress={() => handleSubmit()} title="Sign in" />
+                                            <Button
+                                                loader={loader}
+                                                onPress={() => handleSubmit()}
+                                                title="Sign in"
+                                            />
                                         </View>
                                     </>
                                 );

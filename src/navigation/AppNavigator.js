@@ -1,22 +1,23 @@
 import React from "react";
 import {
-    SafeAreaView,
-    StatusBar,
-    Text,
-    View,
-    StyleSheet,
-    Pressable,
+  SafeAreaView,
+  StatusBar,
+  Text,
+  View,
+  StyleSheet,
+  Pressable,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import {
-    Login,
-    Signup,
-    ForgotPassword,
-    Home,
-    Notification,
-    Search,
-    Apartment,
+  Login,
+  Signup,
+  ForgotPassword,
+  Home,
+  Notification,
+  Search,
+  Apartment,
+  Splash,
 } from "../screens";
 import { useUser } from "../hooks/useUser";
 import { useDispatch, useSelector } from "react-redux";
@@ -28,28 +29,29 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const Stack = createStackNavigator();
 
 function AppNavigator() {
-    const navigation = useNavigation();
-    const routeName = navigation.getCurrentRoute()?.name;
-    const { navigate } = navigation;
-    const { userRole } = useUser();
-    const dispatch = useDispatch();
-    const { user, isActiveSession } = useSelector(({ user }) => user);
+  const navigation = useNavigation();
+  const routeName = navigation.getCurrentRoute()?.name;
+  const { navigate } = navigation;
+  const { userRole } = useUser();
+  const dispatch = useDispatch();
+  const { user, isActiveSession } = useSelector(({ user }) => user);
 
-    React.useEffect(() => {
-        const checkSession = async () => {
-            if (user === null && isActiveSession) {
-                dispatch(clearSession());
-                const creds = await AsyncStorage.getItem("login_creds");
-                AsyncStorage.clear();
-                if (creds) AsyncStorage.setItem("login_creds", creds);
-                navigate("Login");
-            }
-        };
-        checkSession();
-    }, [user]);
-    return (
-        <>
-            {/* <FlashMessage
+  React.useEffect(() => {
+    const checkSession = async () => {
+      const creds = await AsyncStorage.getItem("login_creds");
+      if (!user && isActiveSession) {
+        dispatch(clearSession());
+        if (creds) {
+          AsyncStorage.setItem("login_creds", creds);
+        }
+        navigation.navigate("Login");
+      }
+    };
+    checkSession();
+  }, [user]);
+  return (
+    <>
+      {/* <FlashMessage
               position="top"
               style={{ zIndex: 9999 }}
               MessageComponent={({ message }) => (
@@ -81,51 +83,57 @@ function AppNavigator() {
                 </SafeAreaView>
               )}
             /> */}
-            <StatusBar backgroundColor="#fff" barStyle="dark-content" />
-            <Stack.Navigator initialRouteName="Login">
-                <Stack.Screen
-                    name="Login"
-                    component={Login}
-                    options={{ headerShown: false }}
-                />
+      <StatusBar backgroundColor="#fff" barStyle="dark-content" />
 
-                <Stack.Screen
-                    name="signup"
-                    component={Signup}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="forgotPassword"
-                    component={ForgotPassword}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="home"
-                    component={Home}
-                    options={{ headerShown: false }}
-                />
-                {userRole !== "user" && (
-                    <>
-                        <Stack.Screen
-                            name="search"
-                            component={Search}
-                            options={{ headerShown: false }}
-                        />
-                        <Stack.Screen
-                            name="apartment"
-                            component={Apartment}
-                            options={{ headerShown: false }}
-                        />
-                        <Stack.Screen
-                            name="notification"
-                            component={Notification}
-                            options={{ headerShown: false }}
-                        />
-                    </>
-                )}
-            </Stack.Navigator>
-        </>
-    );
+      <Stack.Navigator initialRouteName="splash">
+        <Stack.Screen
+          name="splash"
+          component={Splash}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Login"
+          component={Login}
+          options={{ headerShown: false }}
+        />
+
+        <Stack.Screen
+          name="signup"
+          component={Signup}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="forgotPassword"
+          component={ForgotPassword}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="home"
+          component={Home}
+          options={{ headerShown: false }}
+        />
+        {userRole !== "user" && (
+          <>
+            <Stack.Screen
+              name="search"
+              component={Search}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="apartment"
+              component={Apartment}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="notification"
+              component={Notification}
+              options={{ headerShown: false }}
+            />
+          </>
+        )}
+      </Stack.Navigator>
+    </>
+  );
 }
 
 export default AppNavigator;

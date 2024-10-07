@@ -5,3 +5,4 @@ export { default as Home } from "./home";
 export { default as Search } from "./Search";
 export { default as Apartment } from "./home/child-screens/apartment";
 export { default as Notification } from "./notification";
+export { default as Splash } from './splash';

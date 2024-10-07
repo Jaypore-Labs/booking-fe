@@ -35,7 +35,6 @@ const Button = (props) => {
                     {props.title}
                 </Text>
             )}
-
         </Ripple>
     );
 };

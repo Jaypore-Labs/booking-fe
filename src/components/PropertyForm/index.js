@@ -5,12 +5,12 @@ import {
     TextInput,
     Switch,
     StyleSheet,
-    Pressable,
     ScrollView,
     SafeAreaView,
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import Button from "../Button";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
@@ -18,7 +18,7 @@ import {
     updateApartment,
 } from "../../endpoints/apartment.service";
 import { setApartments } from "../../store/actions";
-import FlashAlert from "../../components/FlashAlert";
+import { FlashAlert } from "../../components/FlashAlert";
 
 export default function PropertyForm() {
     const navigation = useNavigation();
@@ -44,7 +44,11 @@ export default function PropertyForm() {
                 if (res) {
                     dispatch(setApartments([res, ...apartments]));
                     navigation.navigate("PropertyList");
-                    FlashAlert({ title: "Apartment created successfully" });
+                    FlashAlert({
+                        title: "Apartment created successfully",
+                        notIcon: true,
+                        duration: 1500,
+                    });
                 }
             })
             .catch((error) => {
@@ -95,7 +99,7 @@ export default function PropertyForm() {
                     initialValues={{
                         name: apartment ? apartment.name : "",
                         price: apartment ? apartment.price : "",
-                        type: apartment ? apartment.type : "Studio",
+                        type: apartment ? apartment.type : "studio",
                         comments: apartment ? apartment.comments : "",
                     }}
                     validationSchema={Yup.object().shape({
@@ -162,7 +166,7 @@ export default function PropertyForm() {
                                     styles.input,
                                     touched.type && errors.type ? styles.inputError : {},
                                 ]}
-                                placeholder="e.g., Studio, 1Bed, 2Bed"
+                                placeholder="e.g., studio, 1Bed, 2Bed"
                                 placeholderTextColor="#aaa"
                             />
                             {touched.type && errors.type && (
@@ -191,16 +195,25 @@ export default function PropertyForm() {
                                 <Text style={styles.labeltext}>Active</Text>
                                 <Switch value={isActive} onValueChange={setIsActive} />
                             </View>
-
-                            <Pressable style={styles.button} onPress={handleSubmit}>
-                                <Text style={styles.buttonText}>Save</Text>
-                            </Pressable>
+                            <View
+                                style={{
+                                    width: "100%",
+                                    alignItems: "center",
+                                    marginTop: 20,
+                                }}
+                            >
+                                <Button
+                                    title="Save"
+                                    loader={loader}
+                                    onPress={() => handleSubmit()}
+                                    disabled={loader}
+                                />
+                            </View>
                         </View>
                     )}
                 </Formik>
             </ScrollView>
         </SafeAreaView>
-
     );
 }
 

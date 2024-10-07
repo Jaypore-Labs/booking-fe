@@ -84,7 +84,15 @@ export default function Signup() {
                             <Text style={styles.para}>
                                 Enter your details below for sign up
                                 <Pressable onPress={() => navigation.navigate("Login")}>
-                                    <Text style={[styles.paraHighlighted, { textDecorationLine: 'underline', color: colors.primary }]}>
+                                    <Text
+                                        style={[
+                                            styles.paraHighlighted,
+                                            {
+                                                textDecorationLine: "underline",
+                                                color: colors.primary,
+                                            },
+                                        ]}
+                                    >
                                         Already have account?
                                     </Text>
                                 </Pressable>

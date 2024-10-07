@@ -20,7 +20,7 @@ export default (state = INITIAL_STATE, action) => {
                 user: action.payload.user,
                 tokens: action.payload.tokens,
                 userId: action.payload.userId,
-                isActiveSession: action.payload.user ? true : false,
+                isActiveSession: true,
             };
 
         case USER_LOGOUT:

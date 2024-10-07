@@ -6,16 +6,18 @@ import {
     TextInput,
     Pressable,
     StyleSheet,
-    Platform,
     ScrollView,
     SafeAreaView,
+    Platform,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { createBooking, updateBooking } from "../../endpoints/booking.service";
+import { fetchAvailableApartments } from "../../endpoints/apartment.service";
 import { useDispatch, useSelector } from "react-redux";
-import { setBookings } from "../../store/actions/booking";
 import { FlashAlert } from "../FlashAlert";
+import { setBookings } from "../../store/actions";
+import Button from "../Button";
 import { Formik } from "formik";
 import * as Yup from "yup";
 
@@ -39,31 +41,50 @@ const BookingSchema = Yup.object().shape({
 
 export default function BookingForm() {
     const { user } = useSelector(({ user }) => user);
-    const { apartments = [] } = useSelector(({ apartments }) => apartments);
-    const { bookings } = useSelector(({ bookings }) => bookings);
     const navigation = useNavigation();
-    const route = useRoute();
     const dispatch = useDispatch();
-    const { booking } = route.params || {};
+    const { bookings } = useSelector(({ bookings }) => bookings);
+    const route = useRoute();
 
+    const { booking } = route.params || {};
     const [loader, setLoader] = useState(false);
-    const [fromDate, setFromDate] = useState(
-        booking ? new Date(booking.checkIn) : new Date()
-    );
-    const [toDate, setToDate] = useState(
-        booking ? new Date(booking.checkOut) : new Date()
-    );
+    const [fromDate, setFromDate] = useState(new Date());
+    const [toDate, setToDate] = useState(new Date());
     const [showFromDatePicker, setShowFromDatePicker] = useState(false);
     const [showToDatePicker, setShowToDatePicker] = useState(false);
-    const [selectedApartmentPrice, setSelectedApartmentPrice] = useState("");
+    const [availableApartments, setAvailableApartments] = useState([]);
+    const [isFormEnabled, setIsFormEnabled] = useState(!!booking);
 
-    useEffect(() => {
-        if (booking) {
-            setFromDate(new Date(booking.checkIn));
-            setToDate(new Date(booking.checkOut));
-            setSelectedApartmentPrice(booking.price);
+    const checkAvailability = async () => {
+        setLoader(true);
+        try {
+            const availableApartments = await fetchAvailableApartments(
+                fromDate.toISOString(),
+                toDate.toISOString()
+            );
+
+            if (availableApartments.length > 0) {
+                setAvailableApartments(availableApartments);
+                setIsFormEnabled(true);
+                FlashAlert({ title: "Apartments available!" });
+            } else {
+                setAvailableApartments([]);
+                setIsFormEnabled(false);
+                FlashAlert({
+                    title: "No apartments available for the selected dates",
+                    error: true,
+                });
+            }
+        } catch (error) {
+            FlashAlert({
+                title: "Error checking availability",
+                error: true,
+            });
+        } finally {
+            setLoader(false);
         }
-    }, [booking]);
+    };
+
     const _createBooking = async (values) => {
         setLoader(true);
         createBooking({
@@ -82,23 +103,22 @@ export default function BookingForm() {
         })
             .then((res) => {
                 if (res) {
-                    dispatch(setBookings([res, ...bookings]));
+                    const updatedBookings = bookings.map((item) =>
+                        item.id === res.id ? res : item
+                    );
+                    dispatch(setBookings(updatedBookings));
                     navigation.navigate("BookingsList");
                     FlashAlert({ title: "Booking created successfully" });
                 }
             })
             .catch((error) => {
-                console.log(error);
                 FlashAlert({
-                    title: error?.message,
-                    notIcon: true,
-                    duration: 1500,
+                    title: "Booking failed",
                     error: true,
                 });
             })
             .finally(() => setLoader(false));
     };
-
     const _updateBooking = async (values) => {
         setLoader(true);
         updateBooking(booking.id, {
@@ -132,7 +152,6 @@ export default function BookingForm() {
             })
             .finally(() => setLoader(false));
     };
-
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <ScrollView contentContainerStyle={styles.container}>
@@ -157,98 +176,6 @@ export default function BookingForm() {
                         touched,
                     }) => (
                         <View style={styles.form}>
-                            <Text style={styles.label}>Select Apartment</Text>
-                            <Picker
-                                selectedValue={values.apartmentId}
-                                onValueChange={(itemValue, itemIndex) => {
-                                    handleChange("apartmentId")(itemValue);
-                                    const selectedApartment = apartments.find(
-                                        (apartment) => apartment.id === itemValue
-                                    );
-                                    setSelectedApartmentPrice(
-                                        selectedApartment ? selectedApartment.price : ""
-                                    );
-                                    values.price = selectedApartment
-                                        ? selectedApartment.price.toString()
-                                        : ""; // Set default price from selected apartment
-                                }}
-                                style={styles.picker}
-                            >
-                                <Picker.Item label="Select an apartment" value="" />
-                                {apartments.map((apartment) => (
-                                    <Picker.Item
-                                        key={apartment.id}
-                                        label={`${apartment.name} - ₹${apartment.price}`}
-                                        value={apartment.id}
-                                    />
-                                ))}
-                            </Picker>
-                            {touched.apartmentId && errors.apartmentId && (
-                                <Text style={styles.error}>{errors.apartmentId}</Text>
-                            )}
-                            {/* <Text style={styles.label}>Apartment Name</Text>
-                        <TextInput
-                            value={values.apartmentId}
-                            onChangeText={handleChange("apartmentId")}
-                            onBlur={handleBlur("apartmentId")}
-                            style={[
-                                styles.input,
-                                touched.apartmentId && errors.apartmentId
-                                    ? styles.inputError
-                                    : {},
-                            ]}
-                            placeholder="Enter apartment name"
-                        />
-                        {touched.apartmentId && errors.apartmentId && (
-                            <Text style={styles.error}>{errors.apartmentId}</Text>
-                        )} */}
-
-                            <Text style={styles.label}>Price</Text>
-
-                            <TextInput
-                                value={values.price || selectedApartmentPrice}
-                                onChangeText={handleChange("price")}
-                                onBlur={handleBlur("price")}
-                                style={[
-                                    styles.input,
-                                    touched.price && errors.price ? styles.inputError : {},
-                                ]}
-                                keyboardType="numeric"
-                                placeholder="Enter price"
-                            />
-                            {touched.price && errors.price && (
-                                <Text style={styles.error}>{errors.price}</Text>
-                            )}
-
-                            <Text style={styles.label}>Deposit</Text>
-                            <TextInput
-                                value={values.deposit}
-                                onChangeText={handleChange("deposit")}
-                                onBlur={handleBlur("deposit")}
-                                style={[
-                                    styles.input,
-                                    touched.deposit && errors.deposit ? styles.inputError : {},
-                                ]}
-                                keyboardType="numeric"
-                                placeholder="Enter deposit"
-                            />
-                            {touched.deposit && errors.deposit && (
-                                <Text style={styles.error}>{errors.deposit}</Text>
-                            )}
-
-                            <Text style={styles.label}>Description</Text>
-                            <TextInput
-                                value={values.description}
-                                onChangeText={handleChange("description")}
-                                onBlur={handleBlur("description")}
-                                style={[styles.input, styles.textArea]}
-                                placeholder="Enter description"
-                                multiline
-                            />
-                            {touched.description && errors.description && (
-                                <Text style={styles.error}>{errors.description}</Text>
-                            )}
-
                             <Text style={styles.label}>From Date</Text>
                             <Pressable
                                 onPress={() => setShowFromDatePicker(true)}
@@ -260,7 +187,6 @@ export default function BookingForm() {
                                 <DateTimePicker
                                     value={fromDate}
                                     mode="date"
-                                    display={Platform.OS === "ios" ? "spinner" : "default"}
                                     onChange={(event, selectedDate) => {
                                         setShowFromDatePicker(false);
                                         if (selectedDate) setFromDate(selectedDate);
@@ -279,7 +205,6 @@ export default function BookingForm() {
                                 <DateTimePicker
                                     value={toDate}
                                     mode="date"
-                                    display={Platform.OS === "ios" ? "spinner" : "default"}
                                     onChange={(event, selectedDate) => {
                                         setShowToDatePicker(false);
                                         if (selectedDate) setToDate(selectedDate);
@@ -287,71 +212,148 @@ export default function BookingForm() {
                                 />
                             )}
 
-                            <Text style={styles.label}>Customer Name</Text>
-                            <TextInput
-                                value={values.name}
-                                onChangeText={handleChange("name")}
-                                onBlur={handleBlur("name")}
-                                style={[
-                                    styles.input,
-                                    touched.name && errors.name ? styles.inputError : {},
-                                ]}
-                                placeholder="Enter customer name"
-                            />
-                            {touched.name && errors.name && (
-                                <Text style={styles.error}>{errors.name}</Text>
+                            {!booking && (
+                                <Button
+                                    title="Check Availability"
+                                    onPress={checkAvailability}
+                                    loader={loader}
+                                />
                             )}
 
-                            <Text style={styles.label}>Phone</Text>
-                            <TextInput
-                                value={values.phone}
-                                onChangeText={handleChange("phone")}
-                                onBlur={handleBlur("phone")}
-                                style={[
-                                    styles.input,
-                                    touched.phone && errors.phone ? styles.inputError : {},
-                                ]}
-                                keyboardType="phone-pad"
-                                placeholder="Enter phone number"
-                            />
-                            {touched.phone && errors.phone && (
-                                <Text style={styles.error}>{errors.phone}</Text>
-                            )}
+                            {isFormEnabled && (
+                                <>
+                                    {!booking && (
+                                        <>
+                                            {" "}
+                                            <Text style={[styles.label, { marginTop: 6 }]}>
+                                                Select Apartment
+                                            </Text>
+                                            <Picker
+                                                selectedValue={values.apartmentId}
+                                                onValueChange={handleChange("apartmentId")}
+                                                style={styles.picker}
+                                            >
+                                                <Picker.Item label="Select an apartment" value="" />
+                                                {availableApartments.map((apartment) => (
+                                                    <Picker.Item
+                                                        key={apartment.id}
+                                                        label={`${apartment.name} - ₹${apartment.price}`}
+                                                        value={apartment.id}
+                                                    />
+                                                ))}
+                                            </Picker>
+                                            {touched.apartmentId && errors.apartmentId && (
+                                                <Text style={styles.error}>{errors.apartmentId}</Text>
+                                            )}
+                                        </>
+                                    )}
 
-                            <Pressable onPress={handleSubmit} style={styles.button}>
-                                <Text style={styles.buttonText}>Save</Text>
-                            </Pressable>
+                                    <Text style={styles.label}>Price</Text>
+
+                                    <TextInput
+                                        value={values.price}
+                                        onChangeText={handleChange("price")}
+                                        onBlur={handleBlur("price")}
+                                        style={[
+                                            styles.input,
+                                            touched.price && errors.price ? styles.inputError : {},
+                                        ]}
+                                        keyboardType="numeric"
+                                        placeholder="Enter price"
+                                    />
+                                    {touched.price && errors.price && (
+                                        <Text style={styles.error}>{errors.price}</Text>
+                                    )}
+                                    <Text style={styles.label}>Deposit</Text>
+                                    <TextInput
+                                        value={values.deposit}
+                                        onChangeText={handleChange("deposit")}
+                                        onBlur={handleBlur("deposit")}
+                                        style={[
+                                            styles.input,
+                                            touched.deposit && errors.deposit
+                                                ? styles.inputError
+                                                : {},
+                                        ]}
+                                        keyboardType="numeric"
+                                        placeholder="Enter deposit"
+                                    />
+                                    {touched.deposit && errors.deposit && (
+                                        <Text style={styles.error}>{errors.deposit}</Text>
+                                    )}
+
+                                    <Text style={styles.label}>Description</Text>
+                                    <TextInput
+                                        value={values.description}
+                                        onChangeText={handleChange("description")}
+                                        onBlur={handleBlur("description")}
+                                        style={[styles.input, styles.textArea]}
+                                        placeholder="Enter description"
+                                        multiline
+                                    />
+                                    {touched.description && errors.description && (
+                                        <Text style={styles.error}>{errors.description}</Text>
+                                    )}
+                                    <Text style={styles.label}>Customer Name</Text>
+                                    <TextInput
+                                        value={values.name}
+                                        onChangeText={handleChange("name")}
+                                        onBlur={handleBlur("name")}
+                                        style={[
+                                            styles.input,
+                                            touched.name && errors.name ? styles.inputError : {},
+                                        ]}
+                                        placeholder="Enter customer name"
+                                    />
+                                    {touched.name && errors.name && (
+                                        <Text style={styles.error}>{errors.name}</Text>
+                                    )}
+
+                                    <Text style={styles.label}>Phone</Text>
+                                    <TextInput
+                                        value={values.phone}
+                                        onChangeText={handleChange("phone")}
+                                        onBlur={handleBlur("phone")}
+                                        style={[
+                                            styles.input,
+                                            touched.phone && errors.phone ? styles.inputError : {},
+                                        ]}
+                                        keyboardType="phone-pad"
+                                        placeholder="Enter phone number"
+                                    />
+                                    {touched.phone && errors.phone && (
+                                        <Text style={styles.error}>{errors.phone}</Text>
+                                    )}
+
+                                    <Button
+                                        title="Save"
+                                        loader={loader}
+                                        onPress={() => handleSubmit()}
+                                    />
+                                </>
+                            )}
                         </View>
                     )}
                 </Formik>
             </ScrollView>
         </SafeAreaView>
-
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
-        backgroundColor: "#f0f0f0",
         padding: 16,
-        justifyContent: "center",
     },
     form: {
         backgroundColor: "#fff",
-        borderRadius: 10,
         padding: 20,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 2,
+        borderRadius: 10,
     },
     label: {
         fontSize: 16,
         fontWeight: "600",
         marginBottom: 6,
-        color: "#333",
     },
     input: {
         borderWidth: 1,
@@ -359,15 +361,9 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         padding: 12,
         marginBottom: 12,
-        fontSize: 14,
-        backgroundColor: "#fafafa",
     },
     inputError: {
         borderColor: "red",
-    },
-    textArea: {
-        height: 100,
-        textAlignVertical: "top",
     },
     error: {
         color: "red",
@@ -385,17 +381,9 @@ const styles = StyleSheet.create({
     dateText: {
         color: "#333",
     },
-    button: {
-        backgroundColor: "#0066cc",
-        padding: 16,
-        borderRadius: 8,
-        alignItems: "center",
-        justifyContent: "center",
-        marginTop: 20,
-    },
-    buttonText: {
-        color: "#fff",
-        fontSize: 16,
-        fontWeight: "600",
+    picker: {
+        marginBottom: 12,
+        borderWidth: 1,
+        borderColor: "#dcdcdc",
     },
 });

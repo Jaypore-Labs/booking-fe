@@ -99,7 +99,15 @@ export default function PropertiesList({ navigation }) {
                             </View>
                             <View style={styles.propertyStatusRow}>
                                 <Text style={styles.typetext}>{item.type}</Text>
-                                <Text style={styles.typetext}>
+                                <Text
+                                    style={[
+                                        styles.typetext,
+                                        {
+                                            color: item.active ? "#00FF00" : "#FF0000",
+                                            marginLeft: 10,
+                                        },
+                                    ]}
+                                >
                                     {item.active ? "Active" : "Inactive"}
                                 </Text>
                             </View>

@@ -165,7 +165,8 @@ const styles = StyleSheet.create({
         backgroundColor: "#000000",
     },
     container: {
-        padding: 16,
+        flex: 1,
+        padding: 20,
     },
     bookingCard: {
         padding: 16,
