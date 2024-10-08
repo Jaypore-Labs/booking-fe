@@ -63,26 +63,29 @@ export default function Notification() {
                     <Header title={"Notifications"} />
                     <ScrollView contentContainerStyle={styles.scrollView}>
                         <View style={styles.container}>
-                            <View style={styles.notifications}>
-                                <Text style={styles.date}>Today</Text>
-                                {notifications.map((notification) => (
-                                    <View
-                                        key={notification.id}
-                                        onPress={() => handleNotificationClick(notification.id)}
-                                        style={[
-                                            styles.notificationItem,
-                                            {
-                                                backgroundColor: notification.read
-                                                    ? "lightblue"
-                                                    : "#f8f9fa",
-                                            },
-                                        ]}
-                                    >
-                                        <Text>{notification.title}</Text>
-                                        <Text>{notification.message}</Text>
-                                    </View>
-                                ))}
-                            </View>
+                            {notifications && notifications.length > 0 ? (
+                                <View style={styles.notifications}>
+                                    {notifications.map((notification) => (
+                                        <View
+                                            key={notification.id}
+                                            onPress={() => handleNotificationClick(notification.id)}
+                                            style={[
+                                                styles.notificationItem,
+                                                {
+                                                    backgroundColor: notification.read
+                                                        ? "lightblue"
+                                                        : "#f8f9fa",
+                                                },
+                                            ]}
+                                        >
+                                            <Text>{notification.title}</Text>
+                                            <Text>{notification.message}</Text>
+                                        </View>
+                                    ))}
+                                </View>
+                            ) : (
+                                <Text>No found any notification</Text>
+                            )}
                         </View>
                     </ScrollView>
                 </View>

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, Dimensions } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, Dimensions } from "react-native";
 import colors from "@src/config/colors";
 import Ripple from "react-native-material-ripple";
 const width = Math.round(Dimensions.get("window").width);
@@ -21,16 +21,20 @@ const Button = (props) => {
                 opacity: props.disabled ? 0.5 : 1,
             }}
         >
-            <Text
-                style={{
-                    fontSize: 16,
-                    color: props.textColor ? props.textColor : colors.white,
-                    textAlign: "center",
-                    fontWeight: "500",
-                }}
-            >
-                {props.title}
-            </Text>
+            {props.loader ? (
+                <ActivityIndicator color={colors.white} />
+            ) : (
+                <Text
+                    style={{
+                        fontSize: 16,
+                        color: props.textColor ? props.textColor : colors.white,
+                        textAlign: "center",
+                        fontWeight: "500",
+                    }}
+                >
+                    {props.title}
+                </Text>
+            )}
         </Ripple>
     );
 };

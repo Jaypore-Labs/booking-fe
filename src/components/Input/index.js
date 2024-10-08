@@ -10,7 +10,6 @@ import colors from "@src/config/colors";
  */
 export default function CustomInput(props) {
     const [focus, setFocus] = useState(false);
-    const [secureTextEntry, setSecureTextEntry] = useState(props.secureTextEntry);
 
     return (
         <View style={{ position: "relative" }}>
@@ -45,7 +44,7 @@ export default function CustomInput(props) {
                     placeholder={props.placeholder}
                     placeholderTextColor={colors.disabled}
                     selectionColor={colors.primary}
-                    secureTextEntry={secureTextEntry}
+                    secureTextEntry={props.secureTextEntry}
                     onFocus={() => {
                         setFocus(true);
                     }}
@@ -54,18 +53,16 @@ export default function CustomInput(props) {
                         if (props.onBlur) props.onBlur();
                     }}
                 />
-                {props.secureTextEntry ? (
+                {props.toggleSecureEntry ? (
                     <Pressable
                         style={{
                             position: "absolute",
                             right: 20,
                             bottom: 16,
                         }}
-                        onPress={() => {
-                            setSecureTextEntry(!secureTextEntry);
-                        }}
+                        onPress={props.toggleSecureEntry}
                     >
-                        {secureTextEntry ? (
+                        {props.secureTextEntry ? (
                             <EyeOff
                                 stroke={colors.disabled}
                                 fill="none"

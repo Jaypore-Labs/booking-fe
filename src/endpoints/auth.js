@@ -19,3 +19,7 @@ export const requestRefreshToken = async (payload) => {
         .post("/auth/refresh-tokens", payload)
         .then((res) => res.data);
 };
+
+export const getCurrentSession = async () => {
+    return axiosInstance.get("auth/me").then((res) => res?.data);
+};
