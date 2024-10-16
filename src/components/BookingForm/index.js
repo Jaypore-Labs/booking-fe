@@ -74,8 +74,7 @@ export default function BookingForm() {
             if (availableApartments.length > 0) {
                 setAvailableApartments(availableApartments);
                 setIsFormEnabled(true);
-            }
-            else {
+            } else {
                 setAvailableApartments([]);
                 setIsFormEnabled(false);
                 FlashAlert({
@@ -84,7 +83,6 @@ export default function BookingForm() {
                 });
             }
         } catch (error) {
-
             FlashAlert({
                 title: "Error checking availability",
                 error: true,
@@ -95,7 +93,6 @@ export default function BookingForm() {
     };
 
     const _createBooking = async (values) => {
-
         setLoader(true);
         createBooking({
             apartmentId: values.apartmentId,
