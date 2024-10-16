@@ -166,7 +166,7 @@ export default function PropertyForm() {
                                     styles.input,
                                     touched.type && errors.type ? styles.inputError : {},
                                 ]}
-                                placeholder="e.g., studio, 1Bed, 2Bed"
+                                placeholder="e.g., studio, 1bed, 2bed"
                                 placeholderTextColor="#aaa"
                             />
                             {touched.type && errors.type && (

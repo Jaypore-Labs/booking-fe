@@ -58,6 +58,14 @@ export default function BookingForm() {
     const checkAvailability = async () => {
         setLoader(true);
         try {
+            if (toDate < fromDate) {
+                FlashAlert({
+                    title: "Check-out date must be after check-in date.",
+                    error: true,
+                });
+                return;
+            }
+
             const availableApartments = await fetchAvailableApartments(
                 fromDate.toISOString(),
                 toDate.toISOString()
@@ -66,8 +74,8 @@ export default function BookingForm() {
             if (availableApartments.length > 0) {
                 setAvailableApartments(availableApartments);
                 setIsFormEnabled(true);
-                FlashAlert({ title: "Apartments available!" });
-            } else {
+            }
+            else {
                 setAvailableApartments([]);
                 setIsFormEnabled(false);
                 FlashAlert({
@@ -76,6 +84,7 @@ export default function BookingForm() {
                 });
             }
         } catch (error) {
+
             FlashAlert({
                 title: "Error checking availability",
                 error: true,
@@ -86,6 +95,7 @@ export default function BookingForm() {
     };
 
     const _createBooking = async (values) => {
+
         setLoader(true);
         createBooking({
             apartmentId: values.apartmentId,
@@ -120,6 +130,7 @@ export default function BookingForm() {
             .finally(() => setLoader(false));
     };
     const _updateBooking = async (values) => {
+        console.log("Form values:", values);
         setLoader(true);
         updateBooking(booking.id, {
             apartmentId: values.apartmentId,
@@ -139,7 +150,11 @@ export default function BookingForm() {
                     );
                     dispatch(setBookings(updatedBookings));
                     navigation.navigate("BookingsList");
-                    FlashAlert({ title: "Booking updated successfully" });
+                    FlashAlert({
+                        title: "Booking updated successfully",
+                        notIcon: true,
+                        duration: 1500,
+                    });
                 }
             })
             .catch((error) => {
@@ -224,7 +239,6 @@ export default function BookingForm() {
                                 <>
                                     {!booking && (
                                         <>
-                                            {" "}
                                             <Text style={[styles.label, { marginTop: 6 }]}>
                                                 Select Apartment
                                             </Text>
