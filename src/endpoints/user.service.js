@@ -12,3 +12,7 @@ export const getUserProfile = async (userId) => {
 export const deleteUser = async (userId) => {
     return axiosInstance.delete(`users/${userId}`).then((res) => res.data);
 };
+
+export const getUsers = async () => {
+    return axiosInstance.get("/users").then((res) => res?.data);
+};

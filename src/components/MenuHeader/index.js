@@ -3,9 +3,12 @@ import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useDispatch } from "react-redux";
-import { userLogout, resetApartments, resetBookings } from "../../store/actions";
+import {
+    userLogout,
+    resetApartments,
+    resetBookings,
+} from "../../store/actions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-// import { RESET_BOOKINGS } from "../../store/ActionTypes";
 
 export default function MenuHeader({ title }) {
     const navigation = useNavigation();

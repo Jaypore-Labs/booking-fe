@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import {
     SafeAreaView,
     View,
@@ -19,10 +20,6 @@ export default function BookingsList({ navigation }) {
     const { bookings } = useSelector(({ bookings }) => bookings);
     const [loader, setLoader] = useState(false);
     const [apartments, setApartments] = useState({});
-
-    React.useEffect(() => {
-        _fetchBookings();
-    }, []);
 
     const getApartmentName = async (apartmentId) => {
         if (!apartments[apartmentId]) {
@@ -101,6 +98,11 @@ export default function BookingsList({ navigation }) {
         return new Date(dateStr).toLocaleDateString(undefined, options);
     };
 
+    useFocusEffect(
+        useCallback(() => {
+            _fetchBookings();
+        }, [_fetchBookings])
+    );
     return (
         <SafeAreaView style={styles.safeArea}>
             <View style={styles.addButtonContainer}>

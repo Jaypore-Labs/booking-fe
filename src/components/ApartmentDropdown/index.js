@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { createComment } from "../../endpoints/comment.service";
 import { FlashAlert } from "../FlashAlert";
 
-const ApartmentDropdown = ({ apartment }) => {
+const ApartmentDropdown = ({ apartment, name }) => {
     const { user } = useSelector(({ user }) => user);
     const [comment, setComment] = useState("");
     const userId = user?.id;
@@ -13,9 +13,10 @@ const ApartmentDropdown = ({ apartment }) => {
 
     const onSave = async (id) => {
         setLoader(true);
+        const timestamp = new Date().toLocaleString();
         try {
             const res = await createComment({
-                text: comment,
+                text: `${timestamp}: "${comment}" (By ${name})`,
                 userId: userId,
                 postId: id,
             });
@@ -38,7 +39,7 @@ const ApartmentDropdown = ({ apartment }) => {
     return (
         <View style={styles.apartmentCard}>
             <View style={styles.expandedSection}>
-                <Text>{apartment.apartmentId}</Text>
+                <Text>{name}</Text>
                 <Text>
                     Check-in: {new Date(apartment.checkIn).toLocaleDateString()} |
                     Check-out: {new Date(apartment.checkOut).toLocaleDateString()}
