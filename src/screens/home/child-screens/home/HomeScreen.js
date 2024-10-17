@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import {
     SafeAreaView,
     ScrollView,
@@ -11,16 +12,23 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import ApartmentDropdown from "../../../../components/ApartmentDropdown";
-import { fetchAvailableApartments } from "../../../../endpoints/apartment.service";
-import { fetchBookingsByUserId } from "../../../../endpoints/booking.service";
+import {
+    fetchAvailableApartments,
+    fetchApartmentById,
+} from "../../../../endpoints/apartment.service";
+import {
+    fetchBookingsByUserId,
+    fetchBooking,
+} from "../../../../endpoints/booking.service";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Button from "../../../../components/Button";
 import { useSelector } from "react-redux";
+import { useUser } from "../../../../hooks/useUser";
 
 export default function HomeScreen() {
     const { user } = useSelector(({ user }) => user);
     const userId = user?.id;
-
+    const { userRole } = useUser();
     const [loader, setLoader] = useState(false);
     const [showAvailable, setShowAvailable] = useState(false);
     const [availableRooms, setAvailableRooms] = useState([]);
@@ -30,13 +38,38 @@ export default function HomeScreen() {
     const [showToDatePicker, setShowToDatePicker] = useState(false);
     const [bookings, setBookings] = useState([]);
     const [expandedBookingIds, setExpandedBookingIds] = useState([]);
+    const [apartments, setApartments] = useState({});
 
-    const _fetchUserBookings = async () => {
-        if (!userId) return;
+    const getApartmentName = async (apartmentId) => {
+        if (!apartments[apartmentId]) {
+            try {
+                const apartment = await fetchApartmentById(apartmentId);
+                setApartments((prev) => ({
+                    ...prev,
+                    [apartmentId]: apartment.name,
+                }));
+            } catch (error) {
+                console.error("Failed to fetch apartment name", error);
+            }
+        }
+    };
+
+    const _fetchBookings = async () => {
         setLoader(true);
         try {
-            const userBookings = await fetchBookingsByUserId(userId);
+            let userBookings;
+
+            if (userRole !== "user") {
+                userBookings = await fetchBooking();
+            } else {
+                userBookings = await fetchBookingsByUserId(userId);
+            }
             setBookings(userBookings.results);
+            await Promise.all(
+                userBookings.results.map((booking) =>
+                    getApartmentName(booking.apartmentId)
+                )
+            );
         } catch (error) {
             console.error("Error fetching bookings:", error);
         } finally {
@@ -44,9 +77,13 @@ export default function HomeScreen() {
         }
     };
 
-    useEffect(() => {
-        _fetchUserBookings();
-    }, [userId]);
+    useFocusEffect(
+        React.useCallback(() => {
+            if (userId) {
+                _fetchBookings();
+            }
+        }, [userId, userRole])
+    );
 
     const _fetchAvailableApartments = async () => {
         setLoader(true);
@@ -104,7 +141,8 @@ export default function HomeScreen() {
                                     >
                                         <View style={styles.dropdownHeader}>
                                             <Text style={styles.dropdownText}>
-                                                Apt Id-{booking.apartmentId}
+                                                Booking Name -
+                                                {apartments[booking.apartmentId] || "Loading..."}
                                             </Text>
                                             <Icon
                                                 name={
@@ -118,7 +156,10 @@ export default function HomeScreen() {
                                         </View>
                                     </TouchableOpacity>
                                     {expandedBookingIds.includes(booking.id) && (
-                                        <ApartmentDropdown apartment={booking} />
+                                        <ApartmentDropdown
+                                            apartment={booking}
+                                            name={apartments[booking.apartmentId] || "Loading..."}
+                                        />
                                     )}
                                 </View>
                             ))

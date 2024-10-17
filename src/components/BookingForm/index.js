@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
     View,
@@ -8,12 +8,12 @@ import {
     StyleSheet,
     ScrollView,
     SafeAreaView,
-    Platform,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { createBooking, updateBooking } from "../../endpoints/booking.service";
 import { fetchAvailableApartments } from "../../endpoints/apartment.service";
+import { getUsers } from "../../endpoints/user.service";
 import { useDispatch, useSelector } from "react-redux";
 import { FlashAlert } from "../FlashAlert";
 import { setBookings } from "../../store/actions";
@@ -37,6 +37,7 @@ const BookingSchema = Yup.object().shape({
     phone: Yup.string()
         .required("Phone number is required")
         .matches(/^[0-9]+$/, "Phone number must be digits"),
+    userId: Yup.string().required("User name is required"),
 });
 
 export default function BookingForm() {
@@ -54,10 +55,19 @@ export default function BookingForm() {
     const [showToDatePicker, setShowToDatePicker] = useState(false);
     const [availableApartments, setAvailableApartments] = useState([]);
     const [isFormEnabled, setIsFormEnabled] = useState(!!booking);
+    const [allUsers, setAllusers] = useState([]);
 
     const checkAvailability = async () => {
         setLoader(true);
         try {
+            if (toDate < fromDate) {
+                FlashAlert({
+                    title: "Check-out date must be after check-in date.",
+                    error: true,
+                });
+                return;
+            }
+
             const availableApartments = await fetchAvailableApartments(
                 fromDate.toISOString(),
                 toDate.toISOString()
@@ -66,7 +76,6 @@ export default function BookingForm() {
             if (availableApartments.length > 0) {
                 setAvailableApartments(availableApartments);
                 setIsFormEnabled(true);
-                FlashAlert({ title: "Apartments available!" });
             } else {
                 setAvailableApartments([]);
                 setIsFormEnabled(false);
@@ -98,7 +107,7 @@ export default function BookingForm() {
                 name: values.name,
                 phone: values.phone,
             },
-            userId: user?.id,
+            userId: values.userId,
             bookedBy: user?.id,
         })
             .then((res) => {
@@ -120,6 +129,7 @@ export default function BookingForm() {
             .finally(() => setLoader(false));
     };
     const _updateBooking = async (values) => {
+        console.log("Form values:", values);
         setLoader(true);
         updateBooking(booking.id, {
             apartmentId: values.apartmentId,
@@ -129,7 +139,7 @@ export default function BookingForm() {
             checkIn: fromDate.toISOString(),
             checkOut: toDate.toISOString(),
             customerDetail: { name: values.name, phone: values.phone },
-            userId: user?.id,
+            userId: values.userId,
             bookedBy: user?.id,
         })
             .then((res) => {
@@ -139,7 +149,11 @@ export default function BookingForm() {
                     );
                     dispatch(setBookings(updatedBookings));
                     navigation.navigate("BookingsList");
-                    FlashAlert({ title: "Booking updated successfully" });
+                    FlashAlert({
+                        title: "Booking updated successfully",
+                        notIcon: true,
+                        duration: 1500,
+                    });
                 }
             })
             .catch((error) => {
@@ -152,6 +166,32 @@ export default function BookingForm() {
             })
             .finally(() => setLoader(false));
     };
+
+    React.useEffect(() => {
+        _getUsers();
+    }, []);
+
+    const _getUsers = useCallback(async () => {
+        setLoader(true);
+        await getUsers()
+            .then((res) => {
+                if (res) {
+                    setAllusers([...allUsers, ...res?.results]);
+                }
+            })
+            .catch((e) => {
+                FlashAlert({
+                    title: e?.message || "Something went wrong. Try again later.",
+                    notIcon: true,
+                    duration: 1500,
+                    error: true,
+                });
+            })
+            .finally(() => {
+                setLoader(false);
+            });
+    }, []);
+
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <ScrollView contentContainerStyle={styles.container}>
@@ -163,6 +203,7 @@ export default function BookingForm() {
                         description: booking ? booking.description : "",
                         name: booking ? booking.customerDetail?.name : "",
                         phone: booking ? booking.customerDetail?.phone : "",
+                        userId: booking ? booking.userId : "",
                     }}
                     validationSchema={BookingSchema}
                     onSubmit={booking ? _updateBooking : _createBooking}
@@ -224,7 +265,6 @@ export default function BookingForm() {
                                 <>
                                     {!booking && (
                                         <>
-                                            {" "}
                                             <Text style={[styles.label, { marginTop: 6 }]}>
                                                 Select Apartment
                                             </Text>
@@ -293,6 +333,24 @@ export default function BookingForm() {
                                     />
                                     {touched.description && errors.description && (
                                         <Text style={styles.error}>{errors.description}</Text>
+                                    )}
+                                    <Text style={styles.label}>Select User</Text>
+                                    <Picker
+                                        selectedValue={values.userId}
+                                        onValueChange={handleChange("userId")}
+                                        style={styles.picker}
+                                    >
+                                        <Picker.Item label="Select a user" value="" />
+                                        {allUsers.map((user) => (
+                                            <Picker.Item
+                                                key={user.id}
+                                                label={user.name}
+                                                value={user.id}
+                                            />
+                                        ))}
+                                    </Picker>
+                                    {touched.userId && errors.userId && (
+                                        <Text style={styles.error}>{errors.userId}</Text>
                                     )}
                                     <Text style={styles.label}>Customer Name</Text>
                                     <TextInput

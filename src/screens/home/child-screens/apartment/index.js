@@ -163,7 +163,7 @@ const ApartmentList = () => {
           </View>
         )}
       </View>
-      {(showApt && availableApt.length > 0) ? (
+      {showApt && availableApt.length > 0 ? (
         <>
           <View style={styles.headerRow}>
             <Text style={styles.headerText}>Apt Name</Text>

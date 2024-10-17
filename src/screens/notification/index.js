@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
     SafeAreaView,
     ScrollView,
+    TouchableOpacity,
     View,
     Text,
     StyleSheet,
@@ -9,6 +10,7 @@ import {
 } from "react-native";
 import Header from "../../components/Header";
 import * as Notifications from "expo-notifications";
+import Icon from "react-native-vector-icons/MaterialIcons";
 import getNotifications, {
     markNotificationAsRead,
 } from "../../endpoints/notification.service";
@@ -66,7 +68,7 @@ export default function Notification() {
                             {notifications && notifications.length > 0 ? (
                                 <View style={styles.notifications}>
                                     {notifications.map((notification) => (
-                                        <View
+                                        <TouchableOpacity
                                             key={notification.id}
                                             onPress={() => handleNotificationClick(notification.id)}
                                             style={[
@@ -78,13 +80,22 @@ export default function Notification() {
                                                 },
                                             ]}
                                         >
-                                            <Text>{notification.title}</Text>
-                                            <Text>{notification.message}</Text>
-                                        </View>
+                                            <Icon
+                                                name="notifications"
+                                                size={20}
+                                                color="#000"
+                                                style={styles.icon}
+                                            />
+                                            <Text style={styles.notificationText}>
+                                                {notification.message}
+                                            </Text>
+                                        </TouchableOpacity>
                                     ))}
                                 </View>
                             ) : (
-                                <Text>No found any notification</Text>
+                                <Text style={styles.noNotificationText}>
+                                    No notifications found
+                                </Text>
                             )}
                         </View>
                     </ScrollView>
@@ -106,6 +117,7 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 16,
     },
+
     title: {
         fontSize: 24,
         marginBottom: 16,
@@ -115,11 +127,31 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     notificationItem: {
+        flexDirection: "row",
+        alignItems: "center",
         margin: 10,
         padding: 10,
-        border: "1 solid #ccc",
+        borderColor: "#ccc",
+        borderWidth: 1,
         borderRadius: 8,
-        // borderBottomWidth: 1,
-        // borderBottomColor: '#ccc',
+        backgroundColor: "#f8f9fa",
+        flexWrap: "wrap",
+        alignSelf: "stretch",
+    },
+    icon: {
+        marginRight: 10,
+    },
+    notificationText: {
+        fontSize: 16,
+        color: "#333",
+        flexShrink: 1,
+        flexWrap: "wrap",
+        flex: 1,
+    },
+    noNotificationText: {
+        textAlign: "center",
+        fontSize: 16,
+        color: "#6C757D",
+        fontWeight: "500",
     },
 });

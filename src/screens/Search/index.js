@@ -26,9 +26,9 @@ export default function Search() {
         _fetchApartment();
     }, []);
 
-    React.useEffect(() => {
-        setFilteredData(apartments);
-    }, [apartments]);
+    // React.useEffect(() => {
+    //     setFilteredData(apartments);
+    // }, [apartments]);
 
     const _fetchApartment = useCallback(async () => {
         setLoader(true);

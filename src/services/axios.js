@@ -5,8 +5,8 @@ import { userLogout } from "../store/actions";
 const { dispatch } = store;
 
 const axiosInstance = axios.create({
-    // baseURL: " https://kings.weboscy.com/api/v1",
-    baseURL: "http://192.168.105.168:3000/v1",
+    baseURL: " https://kings.weboscy.com/api/v1",
+    // baseURL: "http://192.168.168.593:3000/v1",
     timeout: 30000,
     headers: {
         Accept: "application/json",
