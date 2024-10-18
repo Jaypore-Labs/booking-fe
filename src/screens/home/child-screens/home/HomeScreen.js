@@ -140,9 +140,26 @@ export default function HomeScreen() {
                                         ]}
                                     >
                                         <View style={styles.dropdownHeader}>
+                                            {/* <Text style={styles.dropdownText}>
+                        Booking Name -
+                        {apartments[booking.apartmentId] || "Loading..."}{" "}
+                        Check-in: 10.00 PM / Check-out: 15.00 AM
+                      </Text> */}
                                             <Text style={styles.dropdownText}>
-                                                Booking Name -
-                                                {apartments[booking.apartmentId] || "Loading..."}
+                                                {/* Booking Name -{" "} */}
+                                                {apartments[booking.apartmentId] || "Loading..."} -
+                                                CheckOut{" "}
+                                                {new Date(booking.checkOut).toLocaleTimeString([], {
+                                                    hour: "2-digit",
+                                                    minute: "2-digit",
+                                                    hour12: true,
+                                                })}{" "}
+                                                / CheckIn{" "}
+                                                {new Date(booking.checkIn).toLocaleTimeString([], {
+                                                    hour: "2-digit",
+                                                    minute: "2-digit",
+                                                    hour12: true,
+                                                })}
                                             </Text>
                                             <Icon
                                                 name={
@@ -267,7 +284,7 @@ const styles = StyleSheet.create({
         padding: 16,
     },
     dropdownBox: {
-        padding: 15,
+        padding: 14,
         borderColor: "grey",
         borderWidth: 1,
         borderRadius: 10,
@@ -279,8 +296,9 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     dropdownText: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: "400",
+        flexWrap: 'wrap'
     },
     expandedBox: {
         marginVertical: 8,

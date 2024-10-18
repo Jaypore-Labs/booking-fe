@@ -10,7 +10,6 @@ import {
   Dimensions,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { fetchAvailableApartments } from "../../../../endpoints/apartment.service";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
@@ -28,53 +27,63 @@ const generateDateRange = (startDate, endDate) => {
 };
 
 const ApartmentList = () => {
-  const [showAvailable, setShowAvailable] = useState(false);
   const [availableApt, setAvailableApt] = useState([]);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
+  const [visibleDays, setVisibleDays] = useState(20); // Show 20 days initially
+  const [showAvailable, setShowAvailable] = useState(false);
   const [showFromDatePicker, setShowFromDatePicker] = useState(false);
   const [showToDatePicker, setShowToDatePicker] = useState(false);
-  const [apartments, setApartments] = useState([]);
-  const [visibleApartments, setVisibleApartments] = useState(5);
-  const [showApt, setShowApt] = useState(false);
-  const [dropdownVisible, setDropdownVisible] = useState(false);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [currentPage, setCurrentPage] = useState(1);
 
+  // Fetch apartment availability based on selected date range
   const _fetchAvailableApartments = async () => {
     try {
       const start = startDate.toISOString();
       const checkOut = endDate.toISOString();
       const apartments = await fetchAvailableApartments(start, checkOut);
       setAvailableApt(apartments);
-      setShowApt(true);
     } catch (error) {
       console.error("Error fetching available apartments:", error);
     }
   };
 
+  // Generate date range for the last 2 months and next 2 months
+  const generateFullDateRange = () => {
+    const currentDate = new Date();
+    const start = new Date();
+    start.setMonth(currentDate.getMonth() - 2); // 2 months ago
+    const end = new Date();
+    end.setMonth(currentDate.getMonth() + 2); // 2 months ahead
+
+    return generateDateRange(start, end);
+  };
+
+  // Handle start date change from DateTimePicker
   const handleStartDateChange = (event, selectedDate) => {
-    setShowFromDatePicker(false);
-    if (selectedDate) setStartDate(selectedDate);
+    setShowFromDatePicker(false); // Hide picker
+    if (selectedDate) setStartDate(selectedDate); // Update state with new date
   };
 
+  // Handle end date change from DateTimePicker
   const handleEndDateChange = (event, selectedDate) => {
-    setShowToDatePicker(false);
-    if (selectedDate) setEndDate(selectedDate);
-  };
-  const totalPages = Math.ceil(availableApt.length / rowsPerPage);
-
-  const displayedApartments = availableApt.slice(0, visibleApartments);
-  const handleRowsPerPageChange = (numRows) => {
-    setVisibleApartments(numRows);
-    setDropdownVisible(false);
+    setShowToDatePicker(false); // Hide picker
+    if (selectedDate) setEndDate(selectedDate); // Update state with new date
   };
 
+  // Re-fetch apartments whenever start or end date changes
+  useEffect(() => {
+    _fetchAvailableApartments();
+  }, [startDate, endDate]);
+
+  // Render each apartment row
   const renderApartmentRow = ({ item }) => (
     <View style={styles.apartmentRow}>
+      {/* Apartment Name */}
       <Text style={styles.apartmentName}>{item.name}</Text>
-      <ScrollView horizontal>
-        {generateDateRange(startDate, endDate).map((date, index) => (
+
+      {/* Horizontal Scroll for Availability */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        {generateFullDateRange().slice(0, visibleDays).map((date, index) => (
           <View
             key={index}
             style={[
@@ -82,152 +91,105 @@ const ApartmentList = () => {
               item.isActive ? styles.available : styles.unavailable,
             ]}
           >
-            <Text style={styles.availabilityText}>
-              {item.isActive ? "✓" : ""}
-            </Text>
+            <Text style={styles.tick}>{item.isActive ? "✓" : ""}</Text>
           </View>
         ))}
       </ScrollView>
     </View>
   );
+
+  // Render the header with apartment name and dates
+  const renderHeader = () => (
+    <View style={styles.headerRow}>
+      <Text style={styles.headerText}>Apt Name</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        {generateFullDateRange().slice(0, visibleDays).map((date, index) => (
+          <Text key={index} style={styles.headerDate}>
+            {date.split("-")[2]}/{date.split("-")[1]}
+          </Text>
+        ))}
+      </ScrollView>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.safeArea}>
+      {/* Date Range Picker */}
       <View style={styles.datecard}>
-        <View
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
+        <TouchableOpacity
+          onPress={() => setShowAvailable(!showAvailable)}
+          style={[styles.dateBox, { backgroundColor: "#fff" }]}
         >
-          <TouchableOpacity
-            onPress={() => setShowAvailable(!showAvailable)}
-            style={[styles.dateBox, { backgroundColor: "#fff" }]}
-          >
-            <View style={styles.dropdownHeader}>
-              <Text style={styles.dropdownText}>Date Range</Text>
-              <Icon
-                name={showAvailable ? "chevron-up" : "chevron-down"}
-                size={20}
-                color="#000"
-              />
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={{ marginLeft: 14 }}
-            onPress={_fetchAvailableApartments}
-          >
-            <Icon name="search" size={28} color="#000000" />
-          </TouchableOpacity>
-        </View>
-
-        {showAvailable && (
-          <View>
-            <View style={styles.datePickerContainer}>
-              <Text>From:</Text>
-              <TouchableOpacity
-                onPress={() => setShowFromDatePicker(true)}
-                style={styles.dateButton}
-              >
-                <Text>{startDate.toDateString()}</Text>
-              </TouchableOpacity>
-              {showFromDatePicker && (
-                <DateTimePicker
-                  value={startDate}
-                  mode="date"
-                  display="default"
-                  onChange={handleStartDateChange}
-                />
-              )}
-            </View>
-
-            <View style={styles.datePickerContainer}>
-              <Text>To:</Text>
-              <TouchableOpacity
-                onPress={() => setShowToDatePicker(true)}
-                style={styles.dateButton}
-              >
-                <Text>{endDate.toDateString()}</Text>
-              </TouchableOpacity>
-              {showToDatePicker && (
-                <DateTimePicker
-                  value={endDate}
-                  mode="date"
-                  display="default"
-                  onChange={handleEndDateChange}
-                />
-              )}
-            </View>
+          <View style={styles.dropdownHeader}>
+            <Text style={styles.dropdownText}>Date Range</Text>
+            <Icon
+              name={showAvailable ? "chevron-up" : "chevron-down"}
+              size={20}
+              color="#000"
+            />
           </View>
-        )}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={{ marginLeft: 14 }}
+          onPress={_fetchAvailableApartments}
+        >
+          <Icon name="search" size={28} color="#000000" />
+        </TouchableOpacity>
       </View>
-      {showApt && availableApt.length > 0 ? (
-        <>
-          <View style={styles.headerRow}>
-            <Text style={styles.headerText}>Apt Name</Text>
-            <ScrollView horizontal>
-              {generateDateRange(startDate, endDate).map((date, index) => (
-                <Text key={index} style={styles.headerText}>
-                  {date.split("-")[2]}/{date.split("-")[1]}
-                </Text>
-              ))}
-            </ScrollView>
+
+
+      {showAvailable && (
+        <View>
+          {/* Start Date Picker */}
+          <View style={styles.datePickerContainer}>
+            <Text>From:</Text>
+            <TouchableOpacity
+              onPress={() => setShowFromDatePicker(true)}
+              style={styles.dateButton}
+            >
+              <Text>{startDate.toDateString()}</Text>
+            </TouchableOpacity>
+            {showFromDatePicker && (
+              <DateTimePicker
+                value={startDate}
+                mode="date"
+                display="default"
+                onChange={handleStartDateChange}
+              />
+            )}
           </View>
+
+
+          <View style={styles.datePickerContainer}>
+            <Text>To:</Text>
+            <TouchableOpacity
+              onPress={() => setShowToDatePicker(true)}
+              style={styles.dateButton}
+            >
+              <Text>{endDate.toDateString()}</Text>
+            </TouchableOpacity>
+            {showToDatePicker && (
+              <DateTimePicker
+                value={endDate}
+                mode="date"
+                display="default"
+                onChange={handleEndDateChange}
+              />
+            )}
+          </View>
+        </View>
+      )}
+
+      {/* Apartment List with Fixed Header */}
+      {availableApt.length > 0 ? (
+        <>
+          {renderHeader()}
           <FlatList
-            data={displayedApartments}
+            data={availableApt}
             keyExtractor={(item) => item.id.toString()}
             renderItem={renderApartmentRow}
           />
-          <View style={styles.paginationContainer}>
-            <View style={{ position: "relative" }}>
-              <TouchableOpacity
-                style={styles.paginationButton}
-                onPress={() => setDropdownVisible(!dropdownVisible)}
-              >
-                <Text style={styles.paginationText}>
-                  {visibleApartments} Rows
-                </Text>
-                <Icon
-                  name={dropdownVisible ? "chevron-up" : "chevron-down"}
-                  size={20}
-                  color="#000"
-                />
-              </TouchableOpacity>
-              {dropdownVisible && (
-                <View style={styles.dropdown}>
-                  {[5, 10, 15, 20].map((num) => (
-                    <TouchableOpacity
-                      key={num}
-                      style={styles.dropdownItem}
-                      onPress={() => handleRowsPerPageChange(num)}
-                    >
-                      <Text style={styles.dropdownText}>{num} Rows</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-            </View>
-            <Text style={styles.paginationText}>
-              {" "}
-              1-{visibleApartments} of {apartments.length}
-            </Text>
-            <View style={styles.paginationIcons}>
-              <MaterialIcons
-                name="keyboard-double-arrow-left"
-                size={20}
-                color="#000"
-              />
-              <MaterialIcons name="chevron-left" size={20} color="#000" />
-              <MaterialIcons name="chevron-right" size={20} color="#000" />
-              <MaterialIcons
-                name="keyboard-double-arrow-right"
-                size={20}
-                color="#000"
-              />
-            </View>
-          </View>
         </>
       ) : (
         <Text style={{ textAlign: "center" }}>Apartment not found</Text>
@@ -236,6 +198,7 @@ const ApartmentList = () => {
   );
 };
 
+// Styles
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -243,17 +206,12 @@ const styles = StyleSheet.create({
   },
   datecard: {
     display: "flex",
-    flexDirection: "column",
-    borderRadius: 6,
-    borderColor: "#E5E4E2",
-    borderWidth: 1,
-    margin: 20,
-    padding: 16,
+    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    padding: 16,
   },
   dateBox: {
-    width: "50%",
     padding: 15,
     borderColor: "#A9A9A9",
     borderWidth: 1,
@@ -282,67 +240,48 @@ const styles = StyleSheet.create({
     padding: 10,
     justifyContent: "space-between",
     alignItems: "center",
+    borderBottomWidth: 1,
+    borderColor: "#ccc",
   },
   headerText: {
     fontSize: 14,
     fontWeight: "bold",
-    marginHorizontal: 8,
-    color: "#979797",
+    width: Dimensions.get("window").width / 4, // Fixed width for Apt Name
+  },
+  headerDate: {
+    fontSize: 14,
+    marginHorizontal: 10,
   },
   apartmentRow: {
     flexDirection: "row",
     padding: 10,
     borderBottomWidth: 1,
     borderColor: "#ccc",
-    justifyContent: "space-between",
     alignItems: "center",
   },
   apartmentName: {
     fontSize: 16,
     fontWeight: "bold",
-    width: Dimensions.get("window").width / 4,
+    width: Dimensions.get("window").width / 4, // Fixed width for Apt Name
   },
   availabilityItem: {
-    width: Dimensions.get("window").width / 10,
-    justifyContent: "space-between",
+    width: 50, // Fixed width for each date box
+    justifyContent: "center",
     alignItems: "center",
     padding: 8,
     borderWidth: 1,
     borderColor: "#ccc",
-    // borderRadius: 4,
-    marginRight: 12,
+    marginHorizontal: 6,
   },
-  availabilityText: {
+  tick: {
     fontSize: 16,
-    color: "#ffffff",
+    color: "#fff",
   },
   available: {
     backgroundColor: "#7b68ee",
   },
   unavailable: {
     backgroundColor: "#ffffff",
-  },
-  paginationContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 16,
-  },
-  paginationButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 8,
-    borderColor: "#A9A9A9",
-    borderWidth: 1,
-    borderRadius: 4,
-  },
-  paginationText: {
-    fontSize: 12,
-  },
-  paginationIcons: {
-    flexDirection: "row",
-    alignItems: "center",
   },
 });
 
