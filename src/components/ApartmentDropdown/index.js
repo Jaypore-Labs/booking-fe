@@ -41,8 +41,8 @@ const ApartmentDropdown = ({ apartment, name }) => {
             <View style={styles.expandedSection}>
                 <Text>{name}</Text>
                 <Text>
-                    Check-in: {new Date(apartment.checkIn).toLocaleDateString()} |
-                    Check-out: {new Date(apartment.checkOut).toLocaleDateString()}
+                    CheckOut: {new Date(apartment.checkOut).toLocaleString()} / CheckIn:{" "}
+                    {new Date(apartment.checkIn).toLocaleString()}
                 </Text>
                 <TextInput
                     style={styles.commentInput}
