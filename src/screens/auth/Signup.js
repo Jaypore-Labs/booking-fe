@@ -4,6 +4,7 @@ import {
     ScrollView,
     KeyboardAvoidingView,
     View,
+    TouchableOpacity,
     Text,
     TextInput,
     Platform,
@@ -50,7 +51,7 @@ export default function Signup() {
             name: values.username,
             email: values.email,
             password: values.password,
-            role: 'admin',
+            role: "admin",
         })
             .then(async (res) => {
                 if (res) {
@@ -84,7 +85,7 @@ export default function Signup() {
                         <View style={{ width: "78%", marginBottom: 30 }}>
                             <Text style={styles.para}>
                                 Enter your details below for sign up
-                                <Pressable onPress={() => navigation.navigate("Login")}>
+                                <TouchableOpacity onPress={() => navigation.navigate("Login")}>
                                     <Text
                                         style={[
                                             styles.paraHighlighted,
@@ -96,7 +97,7 @@ export default function Signup() {
                                     >
                                         Already have account?
                                     </Text>
-                                </Pressable>
+                                </TouchableOpacity>
                             </Text>
                         </View>
                         <Formik

@@ -8,13 +8,16 @@ export default StyleSheet.create({
         width: width,
         height: height,
         backgroundColor: colors.white,
+        flex: 1,
+        justifyContent: "center",  // Vertically center the content
+        alignItems: "center",
     },
     heading: {
         fontSize: 30,
         color: colors.text,
         fontWeight: "600",
         marginTop: 20,
-        marginBottom: 8,
+        // marginBottom: 8,
     },
     para: {
         fontSize: 15,

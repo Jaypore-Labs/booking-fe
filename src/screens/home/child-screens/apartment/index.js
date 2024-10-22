@@ -30,12 +30,11 @@ const ApartmentList = () => {
   const [availableApt, setAvailableApt] = useState([]);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
-  const [visibleDays, setVisibleDays] = useState(20); // Show 20 days initially
+  const [visibleDays, setVisibleDays] = useState(20);
   const [showAvailable, setShowAvailable] = useState(false);
   const [showFromDatePicker, setShowFromDatePicker] = useState(false);
   const [showToDatePicker, setShowToDatePicker] = useState(false);
 
-  // Fetch apartment availability based on selected date range
   const _fetchAvailableApartments = async () => {
     try {
       const start = startDate.toISOString();
@@ -47,53 +46,48 @@ const ApartmentList = () => {
     }
   };
 
-  // Generate date range for the last 2 months and next 2 months
   const generateFullDateRange = () => {
     const currentDate = new Date();
     const start = new Date();
-    start.setMonth(currentDate.getMonth() - 2); // 2 months ago
+    start.setMonth(currentDate.getMonth() - 2);
     const end = new Date();
-    end.setMonth(currentDate.getMonth() + 2); // 2 months ahead
+    end.setMonth(currentDate.getMonth() + 2);
 
     return generateDateRange(start, end);
   };
 
-  // Handle start date change from DateTimePicker
   const handleStartDateChange = (event, selectedDate) => {
     setShowFromDatePicker(false); // Hide picker
-    if (selectedDate) setStartDate(selectedDate); // Update state with new date
+    if (selectedDate) setStartDate(selectedDate);
   };
 
-  // Handle end date change from DateTimePicker
   const handleEndDateChange = (event, selectedDate) => {
     setShowToDatePicker(false); // Hide picker
-    if (selectedDate) setEndDate(selectedDate); // Update state with new date
+    if (selectedDate) setEndDate(selectedDate);
   };
 
-  // Re-fetch apartments whenever start or end date changes
   useEffect(() => {
     _fetchAvailableApartments();
   }, [startDate, endDate]);
 
-  // Render each apartment row
   const renderApartmentRow = ({ item }) => (
     <View style={styles.apartmentRow}>
-      {/* Apartment Name */}
       <Text style={styles.apartmentName}>{item.name}</Text>
 
-      {/* Horizontal Scroll for Availability */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        {generateFullDateRange().slice(0, visibleDays).map((date, index) => (
-          <View
-            key={index}
-            style={[
-              styles.availabilityItem,
-              item.isActive ? styles.available : styles.unavailable,
-            ]}
-          >
-            <Text style={styles.tick}>{item.isActive ? "✓" : ""}</Text>
-          </View>
-        ))}
+        {generateFullDateRange()
+          .slice(0, visibleDays)
+          .map((date, index) => (
+            <View
+              key={index}
+              style={[
+                styles.availabilityItem,
+                item.isActive ? styles.available : styles.unavailable,
+              ]}
+            >
+              <Text style={styles.tick}>{item.isActive ? "✓" : ""}</Text>
+            </View>
+          ))}
       </ScrollView>
     </View>
   );
@@ -103,11 +97,13 @@ const ApartmentList = () => {
     <View style={styles.headerRow}>
       <Text style={styles.headerText}>Apt Name</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        {generateFullDateRange().slice(0, visibleDays).map((date, index) => (
-          <Text key={index} style={styles.headerDate}>
-            {date.split("-")[2]}/{date.split("-")[1]}
-          </Text>
-        ))}
+        {generateFullDateRange()
+          .slice(0, visibleDays)
+          .map((date, index) => (
+            <Text key={index} style={styles.headerDate}>
+              {date.split("-")[2]}/{date.split("-")[1]}
+            </Text>
+          ))}
       </ScrollView>
     </View>
   );
@@ -138,10 +134,8 @@ const ApartmentList = () => {
         </TouchableOpacity>
       </View>
 
-
       {showAvailable && (
         <View>
-          {/* Start Date Picker */}
           <View style={styles.datePickerContainer}>
             <Text>From:</Text>
             <TouchableOpacity
@@ -159,7 +153,6 @@ const ApartmentList = () => {
               />
             )}
           </View>
-
 
           <View style={styles.datePickerContainer}>
             <Text>To:</Text>
@@ -181,7 +174,6 @@ const ApartmentList = () => {
         </View>
       )}
 
-      {/* Apartment List with Fixed Header */}
       {availableApt.length > 0 ? (
         <>
           {renderHeader()}
@@ -198,7 +190,6 @@ const ApartmentList = () => {
   );
 };
 
-// Styles
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -262,10 +253,10 @@ const styles = StyleSheet.create({
   apartmentName: {
     fontSize: 16,
     fontWeight: "bold",
-    width: Dimensions.get("window").width / 4, // Fixed width for Apt Name
+    width: Dimensions.get("window").width / 4,
   },
   availabilityItem: {
-    width: 50, // Fixed width for each date box
+    width: 50,
     justifyContent: "center",
     alignItems: "center",
     padding: 8,

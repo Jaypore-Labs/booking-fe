@@ -83,13 +83,15 @@ export default function CustomInput(props) {
             {props.errorMessage && (
                 <Text
                     style={{
-                        fontSize: 10,
-                        position: "absolute",
-                        top: 52,
-                        left: 4,
+                        // fontSize: 10,
+                        // position: "absolute",
+                        // top: 52,
+                        // left: 4,
                         color: colors.danger,
                         color: colors.para,
-                        fontSize: 14,
+                        fontSize: 12,
+                        marginTop: 2,
+                        marginBottom: 2,
                     }}
                 >
                     {props.errorMessage}
