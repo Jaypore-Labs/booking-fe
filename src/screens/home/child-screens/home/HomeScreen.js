@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
     dropdownText: {
         fontSize: 14,
         fontWeight: "400",
-        flexWrap: 'wrap'
+        flexWrap: "wrap",
     },
     expandedBox: {
         marginVertical: 8,

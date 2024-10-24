@@ -98,7 +98,7 @@ export default function Login() {
         <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
             <KeyboardAvoidingView style={{ flex: 1 }}>
                 <View style={styles.wrapper}>
-                    <ScrollView style={{ flex: 1, paddingHorizontal: 16 }}>
+                    <ScrollView style={{ flexGrow: 1 }}>
                         <Text style={styles.heading}>Welcome to Kings</Text>
                         <View style={{ width: "78%", marginBottom: 30 }}>
                             <Text>Log in via Email </Text>
@@ -211,11 +211,15 @@ export default function Login() {
                                             {touched.password && errors.password && (
                                                 <Text
                                                     style={{
-                                                        fontSize: 10,
-                                                        position: "absolute",
-                                                        top: 58,
-                                                        left: 4,
-                                                        color: colors.danger,
+                                                        // fontSize: 10,
+                                                        // position: "absolute",
+                                                        // top: 58,
+                                                        // left: 4,
+                                                        // color: colors.danger,
+                                                        color: colors.para,
+                                                        fontSize: 12,
+                                                        marginTop: 2,
+                                                        marginBottom: 2,
                                                     }}
                                                 >
                                                     {touched.password && errors.password}
@@ -255,7 +259,7 @@ export default function Login() {
                                     justifyContent: "center",
                                     backgroundColor: colors.lightDisabled,
                                     width: "100%",
-                                    justifyContent: "space-around",
+                                    // justifyContent: "space-around",
                                     marginTop: 10,
                                     padding: 13,
                                     borderRadius: 8,
