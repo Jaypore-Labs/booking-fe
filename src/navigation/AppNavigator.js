@@ -19,6 +19,8 @@ import {
   Apartment,
   Splash,
 } from "../screens";
+import ApartmentDetails from "../screens/home/child-screens/apartment/ApartmentDetails";
+import BookingForm from "../components/BookingForm";
 import { useUser } from "../hooks/useUser";
 import { useDispatch, useSelector } from "react-redux";
 import { clearSession } from "../store/actions";
@@ -112,6 +114,11 @@ function AppNavigator() {
           component={Home}
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="apartmentDetails"   // Add the new route
+          component={ApartmentDetails}
+          options={{ headerShown: false }}
+        />
         {userRole !== "user" && (
           <>
             <Stack.Screen
@@ -127,6 +134,11 @@ function AppNavigator() {
             <Stack.Screen
               name="notification"
               component={Notification}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="bookingForm"
+              component={BookingForm}
               options={{ headerShown: false }}
             />
           </>

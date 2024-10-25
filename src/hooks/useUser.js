@@ -6,8 +6,9 @@ export const UserProvider = ({ children }) => {
     // const [userRole, setUserRole] = useState("admin"); // admin , manager , user
     const { user } = useSelector((state) => state.user);
     const userRole = user?.role || "user";
+    const username = user?.name || 'Guest';
     return (
-        <UserContext.Provider value={{ userRole }}>
+        <UserContext.Provider value={{ userRole, username }}>
             {children}
         </UserContext.Provider>
     );

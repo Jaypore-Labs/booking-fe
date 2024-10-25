@@ -8,11 +8,13 @@ import {
     ScrollView,
     SafeAreaView,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import Button from "../Button";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import Header from "../Header";
 import {
     createApartment,
     updateApartment,
@@ -94,7 +96,8 @@ export default function PropertyForm() {
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
-            <ScrollView contentContainerStyle={styles.container}>
+            <Header title="Property Form" />
+            <ScrollView style={styles.container}>
                 <Formik
                     initialValues={{
                         name: apartment ? apartment.name : "",
@@ -158,6 +161,19 @@ export default function PropertyForm() {
                             )}
 
                             <Text style={styles.labeltext}>Type</Text>
+                            <Picker
+                                selectedValue={values.type}
+                                onValueChange={handleChange("type")}
+                                style={styles.input}
+                            >
+                                <Picker.Item label="Studio" value="studio" />
+                                <Picker.Item label="1 Bed" value="1bed" />
+                                <Picker.Item label="2 Bed" value="2bed" />
+                            </Picker>
+                            {touched.type && errors.type && (
+                                <Text style={styles.error}>{errors.type}</Text>
+                            )}
+                            {/* <Text style={styles.labeltext}>Type</Text>
                             <TextInput
                                 value={values.type}
                                 onChangeText={handleChange("type")}
@@ -171,7 +187,7 @@ export default function PropertyForm() {
                             />
                             {touched.type && errors.type && (
                                 <Text style={styles.error}>{errors.type}</Text>
-                            )}
+                            )} */}
 
                             <Text style={styles.labeltext}>Comments</Text>
                             <TextInput
@@ -193,7 +209,12 @@ export default function PropertyForm() {
 
                             <View style={styles.switchContainer}>
                                 <Text style={styles.labeltext}>Active</Text>
-                                <Switch value={isActive} onValueChange={setIsActive} />
+                                <Switch
+                                    value={isActive}
+                                    onValueChange={setIsActive}
+                                    trackColor={{ false: "#D9DBDC", true: "#7b68ee" }} // grey when off, primary color when on
+                                    thumbColor={isActive ? "#ffffff" : "#f4f3f4"}
+                                />
                             </View>
                             <View
                                 style={{
@@ -218,14 +239,17 @@ export default function PropertyForm() {
 }
 
 const styles = StyleSheet.create({
+
     container: {
-        padding: 20,
-        backgroundColor: "#f5f5f5",
+        paddingHorizontal: 20,
+        backgroundColor: '#fff',
         flexGrow: 1,
-        justifyContent: "center",
+        marginTop: 0,
     },
     form: {
-        backgroundColor: "#fff",
+        marginTop: 0,
+        borderWidth: 1,
+        borderColor: "#D9DBDC",
         borderRadius: 12,
         padding: 20,
         shadowColor: "#000",

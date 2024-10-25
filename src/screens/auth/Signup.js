@@ -19,7 +19,6 @@ import { useNavigation } from "@react-navigation/native";
 import * as Yup from "yup";
 import styles from "./styles";
 import colors from "../../config/colors";
-import { Eye, EyeOff } from "react-native-feather";
 import { userLogout, userLogin } from "../../store/actions";
 import { useDispatch } from "react-redux";
 import { registerUser } from "../../endpoints/auth";
@@ -184,7 +183,7 @@ export default function Signup() {
                                             style={{
                                                 width: "100%",
                                                 alignItems: "center",
-                                                marginTop: 40,
+                                                marginTop: 20,
                                             }}
                                         >
                                             <Button

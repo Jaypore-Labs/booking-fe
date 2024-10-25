@@ -88,7 +88,7 @@ export default function CustomInput(props) {
                         // top: 52,
                         // left: 4,
                         color: colors.danger,
-                        color: colors.para,
+                        // color: colors.para,
                         fontSize: 12,
                         marginTop: 2,
                         marginBottom: 2,

@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { View, StyleSheet, TouchableOpacity, SafeAreaView } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useDispatch } from "react-redux";
@@ -36,35 +36,41 @@ export default function MenuHeader({ title }) {
     };
 
     return (
-        <View style={styles.topBox}>
-            <TouchableOpacity
-                style={styles.iconButton}
-                onPress={() => navigation.openDrawer()}
-            >
-                <Icon name="menu" size={28} color="#fff" />
-            </TouchableOpacity>
-            <View style={styles.rightIcons}>
-                <TouchableOpacity style={styles.iconButton} onPress={_LOGOUT}>
-                    <Icon name="logout" size={28} color="#fff" />
-                </TouchableOpacity>
+        <SafeAreaView style={styles.safeArea}>
+            <View style={styles.topBox}>
                 <TouchableOpacity
                     style={styles.iconButton}
-                    onPress={() => navigation.navigate("search")}
+                    onPress={() => navigation.openDrawer()}
                 >
-                    <Icon name="search" size={28} color="#fff" />
+                    <Icon name="menu" size={28} color="#fff" />
                 </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.iconButton}
-                    onPress={() => navigation.navigate("notification")}
-                >
-                    <Icon name="notifications" size={28} color="#fff" />
-                </TouchableOpacity>
+                <View style={styles.rightIcons}>
+                    <TouchableOpacity
+                        style={styles.iconButton}
+                        onPress={() => navigation.navigate("search")}
+                    >
+                        <Icon name="search" size={28} color="#fff" />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.iconButton}
+                        onPress={() => navigation.navigate("notification")}
+                    >
+                        <Icon name="notifications" size={28} color="#fff" />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.iconButton} onPress={_LOGOUT}>
+                        <Icon name="logout" size={28} color="#fff" />
+                    </TouchableOpacity>
+                </View>
             </View>
-        </View>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 0,
+        backgroundColor: "mediumslateblue", // This color ensures the header looks consistent
+    },
     topBox: {
         backgroundColor: "mediumslateblue",
         padding: 16,
@@ -76,6 +82,6 @@ const styles = StyleSheet.create({
         flexDirection: "row",
     },
     iconButton: {
-        marginLeft: 16,
+        marginLeft: 6,
     },
 });

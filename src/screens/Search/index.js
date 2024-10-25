@@ -10,10 +10,12 @@ import {
     FlatList,
     Platform,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { fetchApartment } from "../../endpoints/apartment.service";
 import { useDispatch, useSelector } from "react-redux";
 import { setApartments } from "../../store/actions";
+import Header from "../../components/Header";
 
 export default function Search() {
     const dispatch = useDispatch();
@@ -21,6 +23,7 @@ export default function Search() {
     const [filteredData, setFilteredData] = useState(apartments);
     const [searchQuery, setSearchQuery] = useState("");
     const [loader, setLoader] = useState(false);
+    const { navigate } = useNavigation();
 
     React.useEffect(() => {
         _fetchApartment();
@@ -83,9 +86,14 @@ export default function Search() {
         setSearchQuery(text);
         debouncedSearch(text);
     };
-
+    const handleApartmentPress = (item) => {
+        navigate("apartmentDetails", {
+            apartment: item,
+        });
+    };
     return (
         <SafeAreaView style={styles.safeArea}>
+            <Header title="Search Apartments" navigation="home" />
             <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 style={styles.container}
@@ -109,20 +117,24 @@ export default function Search() {
                             data={filteredData}
                             keyExtractor={(item) => item.id.toString()}
                             renderItem={({ item }) => (
-                                <View style={styles.card}>
-                                    <Text style={styles.price}>
-                                        {"\u20B9"}
-                                        {item.price}/DAY
-                                    </Text>
-                                    <Text style={styles.name}>{item.name}</Text>
-                                    <View style={styles.cardRow}>
-                                        <Icon name="bed" size={18} color="#C5C5C5" />
-                                        <Text style={styles.typeText}>{item.type}</Text>
+                                <TouchableOpacity onPress={() => handleApartmentPress(item)}>
+                                    <View style={styles.card}>
+                                        <View style={styles.cardRow}>
+                                            <Text style={styles.name}>{item.name}</Text>
+                                            <Text style={styles.price}>
+                                                {"\u20B9"}
+                                                {item.price}/DAY
+                                            </Text>
+                                        </View>
+                                        <View>
+                                            <Icon name="bed" size={18} color="#C5C5C5" />
+                                            <Text style={styles.typeText}>{item.type}</Text>
+                                        </View>
                                         <Text style={styles.status}>
                                             {item.active ? "Active" : "Inactive"}
                                         </Text>
                                     </View>
-                                </View>
+                                </TouchableOpacity>
                             )}
                         />
                     )}
@@ -173,19 +185,19 @@ const styles = StyleSheet.create({
         elevation: 1,
     },
     price: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: "bold",
         color: "#3E904A",
     },
     name: {
-        fontSize: 14,
+        fontSize: 16,
         color: "#000",
         fontWeight: "600",
     },
     cardRow: {
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "flex-start",
+        justifyContent: "space-around",
         marginVertical: 6,
     },
     typeText: {

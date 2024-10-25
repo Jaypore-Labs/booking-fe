@@ -9,15 +9,20 @@ const width = Dimensions.get("window").width;
  */
 const Header = (props) => {
     const navigation = useNavigation();
+    const handlePress = () => {
+        if (props.navigation) {
+            navigation.navigate(props.navigation); // Only called when pressed
+        } else {
+            navigation.goBack(); // Go back if no navigation prop is passed
+        }
+    };
     return (
         <View style={{ ...styles.header, ...props.style }}>
             <Pressable
                 style={{
                     paddingHorizontal: 0,
                 }}
-                onPress={
-                    props.navigation ? props.navigation : () => navigation.goBack()
-                }
+                onPress={() => handlePress()}
             >
                 <BackSvg />
             </Pressable>

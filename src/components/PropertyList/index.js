@@ -5,7 +5,7 @@ import {
     Text,
     FlatList,
     StyleSheet,
-    Pressable,
+    TouchableOpacity,
 } from "react-native";
 import Button from "../Button";
 import { FlashAlert } from "../FlashAlert";
@@ -15,6 +15,9 @@ import {
 } from "../../endpoints/apartment.service";
 import { useDispatch, useSelector } from "react-redux";
 import { setApartments } from "../../store/actions/apartment";
+import colors from "../../config/colors";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import Header from "../Header";
 
 export default function PropertiesList({ navigation }) {
     const dispatch = useDispatch();
@@ -77,6 +80,7 @@ export default function PropertiesList({ navigation }) {
 
     return (
         <SafeAreaView style={styles.safeArea}>
+            <Header title="Properties" navigation="home" />
             <View style={styles.headerContainer}>
                 <Button
                     title={"Add Property"}
@@ -91,41 +95,39 @@ export default function PropertiesList({ navigation }) {
                     renderItem={({ item }) => (
                         <View style={styles.propertyCard}>
                             <View style={styles.propertyInfoRow}>
-                                <Text style={styles.name}>{item.name}</Text>
+                                <Text style={styles.name}>Name: {item.name}</Text>
                                 <Text style={styles.price}>
-                                    {"\u20B9"}
+                                    Price: {"\u20B9"}
                                     {item.price}/DAY
                                 </Text>
                             </View>
-                            <View style={styles.propertyStatusRow}>
-                                <Text style={styles.typetext}>{item.type}</Text>
-                                <Text
-                                    style={[
-                                        styles.typetext,
-                                        {
-                                            color: item.active ? "#00FF00" : "#FF0000",
-                                            marginLeft: 10,
-                                        },
-                                    ]}
-                                >
-                                    {item.active ? "Active" : "Inactive"}
-                                </Text>
-                            </View>
-
+                            <Text style={styles.typetext}>Type: {item.type}</Text>
+                            <Text
+                                style={[
+                                    styles.typetext,
+                                    {
+                                        color: item.active ? "#00FF00" : "#FF0000",
+                                    },
+                                ]}
+                            >
+                                Status: {item.active ? "Active" : "Inactive"}
+                            </Text>
                             <Text style={styles.comments}>{item.description}</Text>
                             <View style={styles.buttonRow}>
-                                <Pressable
-                                    style={styles.button}
+                                <TouchableOpacity
+                                    style={[styles.button, styles.editButton]}
                                     onPress={() => updateApartment(item)}
                                 >
-                                    <Text style={styles.text}>EDIT</Text>
-                                </Pressable>
-                                <Pressable
-                                    style={styles.button}
+                                    <Icon name="edit" size={16} color="#fff" style={styles.icon} />
+                                    <Text style={styles.text}>Edit</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.button, styles.deleteButton]}
                                     onPress={() => _deleteApartment(item.id)}
                                 >
-                                    <Text style={styles.text}>DEL</Text>
-                                </Pressable>
+                                    <Icon name="delete" size={16} color="#fff" style={styles.icon} />
+                                    <Text style={styles.text}>Delete</Text>
+                                </TouchableOpacity>
                             </View>
                         </View>
                     )}
@@ -142,18 +144,20 @@ const styles = StyleSheet.create({
     },
     headerContainer: {
         alignItems: "center",
-        marginTop: 40,
+        // marginTop: 4,
     },
     addButton: {
-        backgroundColor: "#000000",
+        backgroundColor: colors.primary,
     },
     container: {
         flex: 1,
-        padding: 20,
+        padding: 18,
     },
     propertyCard: {
-        padding: 16,
-        backgroundColor: "#E9EAEC",
+        padding: 14,
+        backgroundColor: "#FFFFFF",
+        borderColor: "#E9EAEC",
+        borderWidth: 1,
         margin: 10,
         borderRadius: 10,
         elevation: 1,
@@ -164,7 +168,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
     },
     price: {
-        fontSize: 18,
+        fontSize: 14,
         fontWeight: "bold",
         color: "#3E904A",
     },
@@ -178,9 +182,9 @@ const styles = StyleSheet.create({
         color: "grey",
     },
     typetext: {
-        marginVertical: 6,
-        fontSize: 12,
-        color: "grey",
+        marginVertical: 2,
+        fontSize: 14,
+        color: "#808080",
     },
     propertyStatusRow: {
         flexDirection: "row",
@@ -191,6 +195,25 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "flex-end",
+    },
+    button: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderRadius: 6,
+        marginHorizontal: 5,
+        elevation: 2,
+    },
+    icon: {
+        marginRight: 6,
+    },
+    editButton: {
+        backgroundColor: colors.primary,
+    },
+    deleteButton: {
+        backgroundColor: "#808080",
     },
     button: {
         alignItems: "center",
