@@ -9,10 +9,12 @@ import {
     resetBookings,
 } from "../../store/actions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useUser } from "../../hooks/useUser";
 
 export default function MenuHeader({ title }) {
     const navigation = useNavigation();
     const dispatch = useDispatch();
+    const { userRole, username } = useUser();
     const [loader, setLoader] = React.useState(false);
 
     const _LOGOUT = async () => {
@@ -45,18 +47,23 @@ export default function MenuHeader({ title }) {
                     <Icon name="menu" size={28} color="#fff" />
                 </TouchableOpacity>
                 <View style={styles.rightIcons}>
-                    <TouchableOpacity
-                        style={styles.iconButton}
-                        onPress={() => navigation.navigate("search")}
-                    >
-                        <Icon name="search" size={28} color="#fff" />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.iconButton}
-                        onPress={() => navigation.navigate("notification")}
-                    >
-                        <Icon name="notifications" size={28} color="#fff" />
-                    </TouchableOpacity>
+                    {userRole !== "user" && (
+                        <>
+                            <TouchableOpacity
+                                style={styles.iconButton}
+                                onPress={() => navigation.navigate("search")}
+                            >
+                                <Icon name="search" size={28} color="#fff" />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.iconButton}
+                                onPress={() => navigation.navigate("notification")}
+                            >
+                                <Icon name="notifications" size={28} color="#fff" />
+                            </TouchableOpacity>
+                        </>
+                    )}
+
                     <TouchableOpacity style={styles.iconButton} onPress={_LOGOUT}>
                         <Icon name="logout" size={28} color="#fff" />
                     </TouchableOpacity>
@@ -69,7 +76,7 @@ export default function MenuHeader({ title }) {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 0,
-        backgroundColor: "mediumslateblue", // This color ensures the header looks consistent
+        backgroundColor: "mediumslateblue",
     },
     topBox: {
         backgroundColor: "mediumslateblue",

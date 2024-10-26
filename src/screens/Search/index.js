@@ -118,22 +118,43 @@ export default function Search() {
                             keyExtractor={(item) => item.id.toString()}
                             renderItem={({ item }) => (
                                 <TouchableOpacity onPress={() => handleApartmentPress(item)}>
-                                    <View style={styles.card}>
-                                        <View style={styles.cardRow}>
-                                            <Text style={styles.name}>{item.name}</Text>
+                                    <View style={styles.propertyCard}>
+                                        <View style={styles.propertyInfoRow}>
+                                            <Text style={styles.name}>Name: {item.name}</Text>
                                             <Text style={styles.price}>
-                                                {"\u20B9"}
+                                                Price: {"\u20B9"}
                                                 {item.price}/DAY
                                             </Text>
                                         </View>
-                                        <View>
-                                            <Icon name="bed" size={18} color="#C5C5C5" />
-                                            <Text style={styles.typeText}>{item.type}</Text>
-                                        </View>
-                                        <Text style={styles.status}>
-                                            {item.active ? "Active" : "Inactive"}
+                                        <Text style={styles.typetext}>Type: {item.type}</Text>
+                                        <Text
+                                            style={[
+                                                styles.typetext,
+                                                {
+                                                    color: item.active ? "#00FF00" : "#FF0000",
+                                                },
+                                            ]}
+                                        >
+                                            Status: {item.active ? "Active" : "Inactive"}
                                         </Text>
+                                        <Text style={styles.comments}>{item.description}</Text>
                                     </View>
+                                    {/* <View style={styles.card}>
+                    <View style={styles.cardRow}>
+                      <Text style={styles.name}>{item.name}</Text>
+                      <Text style={styles.price}>
+                        {"\u20B9"}
+                        {item.price}/DAY
+                      </Text>
+                    </View>
+                    <View>
+                      <Icon name="bed" size={18} color="#C5C5C5" />
+                      <Text style={styles.typeText}>{item.type}</Text>
+                    </View>
+                    <Text style={styles.status}>
+                      {item.active ? "Active" : "Inactive"}
+                    </Text>
+                  </View> */}
                                 </TouchableOpacity>
                             )}
                         />
@@ -177,12 +198,19 @@ const styles = StyleSheet.create({
         textAlign: "center",
         marginTop: 20,
     },
-    card: {
-        padding: 16,
-        backgroundColor: "#f8f9fa",
+    propertyCard: {
+        padding: 14,
+        backgroundColor: "#FFFFFF",
+        borderColor: "#E9EAEC",
+        borderWidth: 1,
         margin: 10,
         borderRadius: 10,
         elevation: 1,
+    },
+    propertyInfoRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
     },
     price: {
         fontSize: 14,
@@ -191,23 +219,36 @@ const styles = StyleSheet.create({
     },
     name: {
         fontSize: 16,
-        color: "#000",
+        color: "#000000",
         fontWeight: "600",
     },
-    cardRow: {
+    comments: {
+        fontSize: 10,
+        color: "grey",
+    },
+    typetext: {
+        marginVertical: 2,
+        fontSize: 14,
+        color: "#808080",
+    },
+    propertyStatusRow: {
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "space-around",
-        marginVertical: 6,
+        justifyContent: "flex-start",
     },
-    typeText: {
-        fontSize: 11,
-        color: "grey",
-        marginHorizontal: 6,
+    buttonRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-end",
     },
-    status: {
-        fontSize: 11,
-        color: "grey",
-        marginHorizontal: 6,
+    button: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderRadius: 6,
+        marginHorizontal: 5,
+        elevation: 2,
     },
 });

@@ -17,7 +17,7 @@ import {
   Notification,
   Search,
   Apartment,
-  Splash,
+  Splash
 } from "../screens";
 import ApartmentDetails from "../screens/home/child-screens/apartment/ApartmentDetails";
 import BookingForm from "../components/BookingForm";
@@ -115,7 +115,7 @@ function AppNavigator() {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="apartmentDetails"   // Add the new route
+          name="apartmentDetails"
           component={ApartmentDetails}
           options={{ headerShown: false }}
         />

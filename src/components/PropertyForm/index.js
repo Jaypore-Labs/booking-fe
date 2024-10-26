@@ -7,6 +7,8 @@ import {
     StyleSheet,
     ScrollView,
     SafeAreaView,
+    KeyboardAvoidingView,
+    Dimensions,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { Formik } from "formik";
@@ -21,6 +23,7 @@ import {
 } from "../../endpoints/apartment.service";
 import { setApartments } from "../../store/actions";
 import { FlashAlert } from "../../components/FlashAlert";
+import colors from "../../config/colors";
 
 export default function PropertyForm() {
     const navigation = useNavigation();
@@ -97,7 +100,7 @@ export default function PropertyForm() {
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <Header title="Property Form" />
-            <ScrollView style={styles.container}>
+            <ScrollView contentContainerStyle={styles.container}>
                 <Formik
                     initialValues={{
                         name: apartment ? apartment.name : "",
@@ -173,21 +176,6 @@ export default function PropertyForm() {
                             {touched.type && errors.type && (
                                 <Text style={styles.error}>{errors.type}</Text>
                             )}
-                            {/* <Text style={styles.labeltext}>Type</Text>
-                            <TextInput
-                                value={values.type}
-                                onChangeText={handleChange("type")}
-                                onBlur={handleBlur("type")}
-                                style={[
-                                    styles.input,
-                                    touched.type && errors.type ? styles.inputError : {},
-                                ]}
-                                placeholder="e.g., studio, 1bed, 2bed"
-                                placeholderTextColor="#aaa"
-                            />
-                            {touched.type && errors.type && (
-                                <Text style={styles.error}>{errors.type}</Text>
-                            )} */}
 
                             <Text style={styles.labeltext}>Comments</Text>
                             <TextInput
@@ -212,22 +200,17 @@ export default function PropertyForm() {
                                 <Switch
                                     value={isActive}
                                     onValueChange={setIsActive}
-                                    trackColor={{ false: "#D9DBDC", true: "#7b68ee" }} // grey when off, primary color when on
+                                    trackColor={{ false: "#D9DBDC", true: "#7b68ee" }}
                                     thumbColor={isActive ? "#ffffff" : "#f4f3f4"}
                                 />
                             </View>
-                            <View
-                                style={{
-                                    width: "100%",
-                                    alignItems: "center",
-                                    marginTop: 20,
-                                }}
-                            >
+                            <View style={styles.buttonContainer}>
                                 <Button
                                     title="Save"
                                     loader={loader}
                                     onPress={() => handleSubmit()}
                                     disabled={loader}
+                                    style={{ width: "100%" }}
                                 />
                             </View>
                         </View>
@@ -239,17 +222,14 @@ export default function PropertyForm() {
 }
 
 const styles = StyleSheet.create({
-
     container: {
-        paddingHorizontal: 20,
-        backgroundColor: '#fff',
+        padding: 20,
+        backgroundColor: "#f5f5f5",
         flexGrow: 1,
-        marginTop: 0,
+        justifyContent: "center",
     },
     form: {
-        marginTop: 0,
-        borderWidth: 1,
-        borderColor: "#D9DBDC",
+        backgroundColor: "#fff",
         borderRadius: 12,
         padding: 20,
         shadowColor: "#000",
@@ -257,6 +237,18 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 6,
         elevation: 3,
+    },
+    container: {
+        flexGrow: 1,
+        padding: 16,
+        backgroundColor: "#fff",
+    },
+    form: {
+        backgroundColor: "#fff",
+        padding: 20,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: "#dcdcdc",
     },
     labeltext: {
         fontSize: 16,
@@ -285,6 +277,10 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
         marginBottom: 12,
+    },
+    buttonContainer: {
+        marginTop: 20,
+        alignItems: "center",
     },
     button: {
         alignItems: "center",
