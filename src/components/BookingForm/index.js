@@ -246,7 +246,6 @@ export default function BookingForm() {
                         touched,
                     }) => (
                         <View style={styles.form}>
-
                             <Text style={styles.label}>From Date</Text>
                             <Pressable
                                 onPress={() => setShowFromDatePicker(true)}
@@ -287,7 +286,7 @@ export default function BookingForm() {
                                         title="Check Availability"
                                         onPress={checkAvailability}
                                         loader={loader}
-                                        style={{ width: '100%' }}
+                                        style={{ width: "100%" }}
                                     />
                                 </View>
                             )}
@@ -418,7 +417,7 @@ export default function BookingForm() {
                                             title="Save"
                                             loader={loader}
                                             onPress={() => handleSubmit()}
-                                            style={{ width: '100%' }}
+                                            style={{ width: "100%" }}
                                         />
                                     </View>
                                 </>
@@ -435,14 +434,14 @@ const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
         padding: 16,
-        backgroundColor: '#fff'
+        backgroundColor: "#fff",
     },
     form: {
         backgroundColor: "#fff",
         padding: 20,
         borderRadius: 10,
         borderWidth: 1,
-        borderColor: '#dcdcdc'
+        borderColor: "#dcdcdc",
     },
     label: {
         fontSize: 16,
@@ -473,7 +472,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     buttonContainer: {
-        marginTop: 20,
+        marginVertical: 16,
         alignItems: "center",
     },
     dateText: {

@@ -19,7 +19,6 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import Header from "../Header";
 import colors from "../../config/colors";
 
-
 export default function BookingsList({ navigation }) {
     const dispatch = useDispatch();
     const { bookings } = useSelector(({ bookings }) => bookings);
@@ -110,7 +109,7 @@ export default function BookingsList({ navigation }) {
     );
     return (
         <SafeAreaView style={styles.safeArea}>
-            <Header title="Bookings" navigation="home" />
+            <Header title="Bookings" />
             <View style={styles.addButtonContainer}>
                 <Button
                     title={"Add Booking"}
@@ -130,11 +129,21 @@ export default function BookingsList({ navigation }) {
                                 </Text>
                                 <Text style={styles.price}>Price: {item.price}</Text>
                                 <Text style={styles.light}>Deposit: {item.deposit}</Text>
-                                <Text style={styles.light}>Description: {item.description}</Text>
-                                <Text style={styles.date}>Check-In: {formatDate(item.checkIn)}</Text>
-                                <Text style={styles.date}>Check-Out: {formatDate(item.checkOut)}</Text>
-                                <Text style={styles.detail}>Customer Name: {item.customerDetail?.name}</Text>
-                                <Text style={styles.detail}>Phone No: {item.customerDetail?.phone}</Text>
+                                <Text style={styles.light}>
+                                    Description: {item.description}
+                                </Text>
+                                <Text style={styles.date}>
+                                    Check-In: {formatDate(item.checkIn)}
+                                </Text>
+                                <Text style={styles.date}>
+                                    Check-Out: {formatDate(item.checkOut)}
+                                </Text>
+                                <Text style={styles.detail}>
+                                    Customer Name: {item.customerDetail?.name}
+                                </Text>
+                                <Text style={styles.detail}>
+                                    Phone No: {item.customerDetail?.phone}
+                                </Text>
 
                                 <View style={styles.buttonRow}>
                                     <TouchableOpacity
@@ -166,7 +175,7 @@ export default function BookingsList({ navigation }) {
                         )}
                     />
                 ) : (
-                    <Text>No Booking Available</Text>
+                    <Text style={{ textAlign: "center" }}>No Booking Available</Text>
                 )}
             </View>
         </SafeAreaView>
@@ -187,7 +196,7 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-        padding: 20,
+        padding: 18,
     },
     bookingCard: {
         padding: 14,

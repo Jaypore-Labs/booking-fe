@@ -76,12 +76,10 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: "#fff",
-
     },
     backgroundImage: {
         width: "100%",
         height: "100%",
-
     },
 });
 

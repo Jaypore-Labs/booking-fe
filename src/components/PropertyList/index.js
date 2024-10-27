@@ -80,7 +80,7 @@ export default function PropertiesList({ navigation }) {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <Header title="Properties" navigation="home" />
+            <Header title="Properties" />
             <View style={styles.headerContainer}>
                 <Button
                     title={"Add Property"}
@@ -106,11 +106,11 @@ export default function PropertiesList({ navigation }) {
                                 style={[
                                     styles.typetext,
                                     {
-                                        color: item.active ? "#00FF00" : "#FF0000",
+                                        color: item.isActive ? "#3E904A" : "#FF0000",
                                     },
                                 ]}
                             >
-                                Status: {item.active ? "Active" : "Inactive"}
+                                Status: {item.isActive ? "Active" : "Inactive"}
                             </Text>
                             <Text style={styles.comments}>{item.description}</Text>
                             <View style={styles.buttonRow}>
@@ -118,14 +118,24 @@ export default function PropertiesList({ navigation }) {
                                     style={[styles.button, styles.editButton]}
                                     onPress={() => updateApartment(item)}
                                 >
-                                    <Icon name="edit" size={16} color="#fff" style={styles.icon} />
+                                    <Icon
+                                        name="edit"
+                                        size={16}
+                                        color="#fff"
+                                        style={styles.icon}
+                                    />
                                     <Text style={styles.text}>Edit</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     style={[styles.button, styles.deleteButton]}
                                     onPress={() => _deleteApartment(item.id)}
                                 >
-                                    <Icon name="delete" size={16} color="#fff" style={styles.icon} />
+                                    <Icon
+                                        name="delete"
+                                        size={16}
+                                        color="#fff"
+                                        style={styles.icon}
+                                    />
                                     <Text style={styles.text}>Delete</Text>
                                 </TouchableOpacity>
                             </View>

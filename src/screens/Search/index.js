@@ -131,30 +131,14 @@ export default function Search() {
                                             style={[
                                                 styles.typetext,
                                                 {
-                                                    color: item.active ? "#00FF00" : "#FF0000",
+                                                    color: item.isActive ? "#3E904A" : "#FF0000",
                                                 },
                                             ]}
                                         >
-                                            Status: {item.active ? "Active" : "Inactive"}
+                                            Status: {item.isActive ? "Active" : "Inactive"}
                                         </Text>
                                         <Text style={styles.comments}>{item.description}</Text>
                                     </View>
-                                    {/* <View style={styles.card}>
-                    <View style={styles.cardRow}>
-                      <Text style={styles.name}>{item.name}</Text>
-                      <Text style={styles.price}>
-                        {"\u20B9"}
-                        {item.price}/DAY
-                      </Text>
-                    </View>
-                    <View>
-                      <Icon name="bed" size={18} color="#C5C5C5" />
-                      <Text style={styles.typeText}>{item.type}</Text>
-                    </View>
-                    <Text style={styles.status}>
-                      {item.active ? "Active" : "Inactive"}
-                    </Text>
-                  </View> */}
                                 </TouchableOpacity>
                             )}
                         />

@@ -8,6 +8,7 @@ import ApartmentList from "./child-screens/apartment/index";
 import MenuHeader from "../../components/MenuHeader";
 import { useUser } from "../../hooks/useUser";
 import colors from "../../config/colors";
+import AntDesign from "react-native-vector-icons/AntDesign";
 import {
     DrawerContentScrollView,
     DrawerItemList,
@@ -67,10 +68,8 @@ const CustomDrawerContent = (props) => {
     return (
         <DrawerContentScrollView {...props}>
             <View style={styles.userInfoContainer}>
-                {/* <Image source={require("../../../path/to/user/icon.png")} style={styles.userIcon} /> */}
-                <Text style={styles.username}>
-                    Hi ! {props.user ? props.user : "Guest"}
-                </Text>
+                <AntDesign name="user" size={24} color="#000" style={styles.userIcon} />
+                <Text style={styles.username}>{props.user ? props.user : "Guest"}</Text>
             </View>
             <DrawerItemList {...props} />
         </DrawerContentScrollView>
@@ -84,10 +83,10 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     userIcon: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        marginRight: 16,
+        // width: 40,
+        // height: 40,
+        // borderRadius: 20,
+        marginRight: 8,
     },
     username: {
         fontSize: 16,

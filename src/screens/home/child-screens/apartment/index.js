@@ -11,7 +11,7 @@ import {
   Animated,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
-import { fetchAvailableApartments } from "../../../../endpoints/apartment.service";
+import { fetchAvailableApartmentsDate } from "../../../../endpoints/apartment.service";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 const generateDateRange = (startDate, endDate) => {
@@ -19,6 +19,7 @@ const generateDateRange = (startDate, endDate) => {
   let currentDate = new Date(startDate);
   const lastDate = new Date(endDate);
 
+  // Loop through the date range
   while (currentDate <= lastDate) {
     dates.push(new Date(currentDate).toISOString().split("T")[0]);
     currentDate.setDate(currentDate.getDate() + 1);
@@ -37,27 +38,22 @@ const ApartmentList = () => {
   const [showToDatePicker, setShowToDatePicker] = useState(false);
 
   const scrollX = useRef(new Animated.Value(0)).current;
+  const headerScrollRef = useRef(null); // Ref for the header scroll views
+  const contentScrollRefs = useRef([]);
 
-  const _fetchAvailableApartments = async () => {
+  const _fetchAvailableApartmentsDate = async () => {
     try {
-      const start = startDate.toISOString();
+      const checkIn = startDate.toISOString();
       const checkOut = endDate.toISOString();
-      const apartments = await fetchAvailableApartments(start, checkOut);
+      const apartments = await fetchAvailableApartmentsDate(checkIn, checkOut);
       setAvailableApt(apartments);
-      setShowAvailable(false);
     } catch (error) {
-      console.error("Error fetching available apartments:", error);
+      console.error("Error fetching available apartments Date:", error);
     }
   };
 
   const generateFullDateRange = () => {
-    const currentDate = new Date();
-    const start = new Date();
-    start.setMonth(currentDate.getMonth() - 2);
-    const end = new Date();
-    end.setMonth(currentDate.getMonth() + 2);
-
-    return generateDateRange(start, end);
+    return generateDateRange(startDate, endDate);
   };
 
   const minimumEndDate = new Date(startDate);
@@ -88,23 +84,24 @@ const ApartmentList = () => {
     // if (selectedDate) setEndDate(selectedDate);
   };
 
-  useEffect(() => {
-    _fetchAvailableApartments();
-  }, [startDate, endDate]);
-
-
+  const handleScrollSync = (scrollEvent) => {
+    const offsetX = scrollEvent.nativeEvent.contentOffset.x;
+    headerScrollRef.current?.scrollTo({ x: offsetX, animated: false });
+    contentScrollRefs.current.forEach((ref) => {
+      ref?.scrollTo({ x: offsetX, animated: false });
+    });
+  };
   // Render the header with dates and synchronize scrolling
   const renderHeader = () => (
     <View style={styles.headerRow}>
       <Text style={styles.headerText}>Apt Name</Text>
       <Animated.ScrollView
+        ref={headerScrollRef}
         horizontal
         showsHorizontalScrollIndicator={false}
         scrollEventThrottle={16}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-          { useNativeDriver: false }
-        )}
+        onMomentumScrollEnd={handleScrollSync}
+      // onScroll={handleScrollSync}
       >
         {generateFullDateRange()
           .slice(0, visibleDays)
@@ -118,33 +115,40 @@ const ApartmentList = () => {
   );
 
   // Render each apartment row and synchronize scrolling
-  const renderApartmentRow = ({ item }) => (
+  const renderApartmentRow = ({ item, index }) => (
     <View style={styles.apartmentRow}>
       <Text style={styles.apartmentName}>{item.name}</Text>
 
       <Animated.ScrollView
+        ref={(ref) => (contentScrollRefs.current[index] = ref)}
         horizontal
         showsHorizontalScrollIndicator={false}
         scrollEventThrottle={16}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-          { useNativeDriver: false }
-        )}
-      // scrollX={scrollX} // Sync with header scroll
+        scrollEnabled={true} // Enable scrolling
+        onMomentumScrollEnd={handleScrollSync}
+        onScroll={handleScrollSync}
       >
         {generateFullDateRange()
           .slice(0, visibleDays)
-          .map((date, index) => (
-            <View
-              key={index}
-              style={[
-                styles.availabilityItem,
-                item.isActive ? styles.available : styles.unavailable,
-              ]}
-            >
-              <Text style={styles.tick}>{item.isActive ? "✓" : ""}</Text>
-            </View>
-          ))}
+          .map((date, dateIndex) => {
+            console.log(date);
+            console.log(item.availability);
+            const isAvailable = item.availability[date] ?? null;
+            console.log(isAvailable);
+            return (
+              <View
+                key={dateIndex}
+                style={[
+                  styles.availabilityItem,
+                  isAvailable === true ? styles.available : styles.unavailable,
+                ]}
+              >
+                <Text style={styles.tick}>
+                  {isAvailable === true ? "✓" : "✗"}
+                </Text>
+              </View>
+            );
+          })}
       </Animated.ScrollView>
     </View>
   );
@@ -168,7 +172,7 @@ const ApartmentList = () => {
 
         <TouchableOpacity
           style={{ marginLeft: 14 }}
-          onPress={_fetchAvailableApartments}
+          onPress={_fetchAvailableApartmentsDate}
         >
           <Icon name="search" size={28} color="#000000" />
         </TouchableOpacity>
@@ -221,12 +225,14 @@ const ApartmentList = () => {
           {renderHeader()}
           <FlatList
             data={availableApt}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item) => item._id}
             renderItem={renderApartmentRow}
           />
         </View>
       ) : (
-        <Text style={{ textAlign: "center" }}>Apartment not found</Text>
+        <Text style={{ textAlign: "center", marginTop: 6 }}>
+          Apartment not found
+        </Text>
       )}
     </SafeAreaView>
   );
@@ -313,7 +319,7 @@ const styles = StyleSheet.create({
   },
   tick: {
     fontSize: 16,
-    color: "#fff",
+    color: "#000000",
   },
   available: {
     backgroundColor: "#7b68ee",

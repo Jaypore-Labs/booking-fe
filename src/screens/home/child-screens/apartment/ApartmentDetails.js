@@ -21,17 +21,26 @@ const ApartmentDetails = ({ route }) => {
                     </Text>
 
                     <View style={styles.statusContainer}>
-                        <Text style={styles.status}>
+                        <Text
+                            style={[
+                                styles.status,
+                                {
+                                    color: apartment.isActive ? "#3E904A" : "#FF0000",
+                                },
+                            ]}
+                        >
                             Status: {apartment.isActive ? "Active" : "Inactive"}
                         </Text>
                     </View>
 
                     {userRole !== "user" && (
-                        <View style={{
-                            width: "100%",
-                            alignItems: "center",
-                            marginTop: 20,
-                        }}>
+                        <View
+                            style={{
+                                width: "100%",
+                                alignItems: "center",
+                                marginTop: 20,
+                            }}
+                        >
                             <Button
                                 onPress={() => navigate("bookingForm")}
                                 title="Book Now"
@@ -57,7 +66,7 @@ const styles = StyleSheet.create({
     detailsContainer: {
         backgroundColor: "#fff",
         borderRadius: 10,
-        borderColor: "gray",
+        borderColor: "#E9EAEC",
         borderWidth: 1,
         padding: 16,
         elevation: 3,
@@ -76,7 +85,8 @@ const styles = StyleSheet.create({
     },
     price: {
         fontSize: 14,
-        color: "#4caf50",
+        fontWeight: "500",
+        color: "#3E904A",
         marginBottom: 6,
     },
     type: {
@@ -97,7 +107,6 @@ const styles = StyleSheet.create({
     },
     status: {
         fontSize: 14,
-        fontWeight: "500",
         color: "#ff9800",
     },
 });
