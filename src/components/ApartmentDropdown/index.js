@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { createComment } from "../../endpoints/comment.service";
 import { FlashAlert } from "../FlashAlert";
 
-const ApartmentDropdown = ({ apartment, name, comments }) => {
+const ApartmentDropdown = ({ apartment, name, }) => {
     const { user } = useSelector(({ user }) => user);
     const [comment, setComment] = useState("");
     const userId = user?.id;
@@ -73,19 +73,6 @@ const ApartmentDropdown = ({ apartment, name, comments }) => {
                         />
                     </View>
                 </View>
-
-                {/* <ScrollView style={styles.commentsContainer}>
-                    {comments && comments.length > 0 ? (
-                        comments.map((comment, index) => (
-                            <View key={index} style={styles.commentItem}>
-                                <Text style={styles.userIcon}>👤</Text>
-                                <Text style={styles.commentText}>{comment.text}</Text>
-                            </View>
-                        ))
-                    ) : (
-                        <Text style={styles.noComments}>No comments yet.</Text>
-                    )}
-                </ScrollView> */}
             </View>
         </View>
     );
