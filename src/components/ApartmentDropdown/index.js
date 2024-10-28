@@ -1,15 +1,29 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, StyleSheet } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, TextInput, StyleSheet, ScrollView } from "react-native";
 import Button from "../Button";
 import { useSelector } from "react-redux";
-import { createComment } from "../../endpoints/comment.service";
+import { createComment, fetchComments } from "../../endpoints/comment.service";
 import { FlashAlert } from "../FlashAlert";
 
-const ApartmentDropdown = ({ apartment, name, }) => {
+const ApartmentDropdown = ({ apartment, name }) => {
     const { user } = useSelector(({ user }) => user);
     const [comment, setComment] = useState("");
     const userId = user?.id;
     const [loader, setLoader] = useState(false);
+    const [comments, setComments] = useState([]);
+
+    useEffect(() => {
+        const getComments = async () => {
+            try {
+                const response = await fetchComments(apartment.apartmentId, userId);
+                setComments(response?.results);
+            } catch (error) {
+                console.error("Error fetching comments:", error);
+            }
+        };
+
+        getComments(); // Fetch comments on component mount or when apartment changes
+    }, [userId, apartment.apartmentId]);
 
     const onSave = async (id) => {
         if (!comment.trim()) {
@@ -25,12 +39,13 @@ const ApartmentDropdown = ({ apartment, name, }) => {
         const timestamp = new Date().toLocaleString();
         try {
             const res = await createComment({
-                text: `${timestamp}: "${comment}" (By ${name})`,
+                text: `${timestamp}: ${comment} (By ${name})`,
                 userId: userId,
                 postId: id,
             });
             if (res) {
                 setComment("");
+                // setComments([...comments, newComment]);
                 FlashAlert({ title: "Comment created successfully" });
             }
         } catch (error) {
@@ -45,6 +60,9 @@ const ApartmentDropdown = ({ apartment, name, }) => {
         }
     };
 
+    const filterCommentText = (commentText) => {
+        return commentText.replace(/\s*\(By.*\)$/, "");
+    };
     return (
         <View style={styles.apartmentCard}>
             <View style={styles.expandedSection}>
@@ -73,6 +91,21 @@ const ApartmentDropdown = ({ apartment, name, }) => {
                         />
                     </View>
                 </View>
+                <ScrollView style={styles.commentsContainer}>
+                    {comments.length > 0 ? (
+                        comments.map((commentItem, index) => (
+                            <View key={index} style={styles.commentItem}>
+                                {/* <Text style={styles.userIcon}>👤</Text> */}
+                                <Text style={styles.commentText}>
+                                    {" "}
+                                    {filterCommentText(commentItem.text)}
+                                </Text>
+                            </View>
+                        ))
+                    ) : (
+                        <Text style={styles.noComments}>No comments yet</Text>
+                    )}
+                </ScrollView>
             </View>
         </View>
     );
@@ -135,11 +168,11 @@ const styles = StyleSheet.create({
         fontSize: 18,
     },
     commentText: {
-        fontSize: 16,
-        color: "#333",
+        // fontSize: 16,
+        color: "#777",
     },
     noComments: {
-        fontStyle: "italic",
+        // fontStyle: "italic",
         color: "#777",
     },
 });
