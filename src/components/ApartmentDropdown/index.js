@@ -5,13 +5,22 @@ import { useSelector } from "react-redux";
 import { createComment } from "../../endpoints/comment.service";
 import { FlashAlert } from "../FlashAlert";
 
-const ApartmentDropdown = ({ apartment, name }) => {
+const ApartmentDropdown = ({ apartment, name, comments }) => {
     const { user } = useSelector(({ user }) => user);
     const [comment, setComment] = useState("");
     const userId = user?.id;
     const [loader, setLoader] = useState(false);
 
     const onSave = async (id) => {
+        if (!comment.trim()) {
+            FlashAlert({
+                title: "Comment cannot be empty",
+                notIcon: true,
+                duration: 1500,
+                error: true,
+            });
+            return;
+        }
         setLoader(true);
         const timestamp = new Date().toLocaleString();
         try {
@@ -44,21 +53,39 @@ const ApartmentDropdown = ({ apartment, name }) => {
                     CheckOut: {new Date(apartment.checkOut).toLocaleString()} / CheckIn:{" "}
                     {new Date(apartment.checkIn).toLocaleString()}
                 </Text>
-                <TextInput
-                    style={styles.commentInput}
-                    value={comment}
-                    onChangeText={setComment}
-                    placeholder="Add a comment..."
-                />
-                <View style={styles.buttonContainer}>
-                    <Button
-                        title="Save"
-                        loader={loader}
-                        onPress={() => onSave(apartment.apartmentId)}
-                        disabled={loader}
-                        style={styles.saveButton}
+                <View style={styles.commentcard}>
+                    <TextInput
+                        style={styles.commentInput}
+                        value={comment}
+                        onChangeText={setComment}
+                        placeholder="Add a comment..."
+                        multiline
+                        numberOfLines={4}
+                        textAlignVertical="top"
                     />
+                    <View style={styles.buttonContainer}>
+                        <Button
+                            title="Save"
+                            loader={loader}
+                            onPress={() => onSave(apartment.apartmentId)}
+                            disabled={loader}
+                            style={styles.saveButton}
+                        />
+                    </View>
                 </View>
+
+                {/* <ScrollView style={styles.commentsContainer}>
+                    {comments && comments.length > 0 ? (
+                        comments.map((comment, index) => (
+                            <View key={index} style={styles.commentItem}>
+                                <Text style={styles.userIcon}>👤</Text>
+                                <Text style={styles.commentText}>{comment.text}</Text>
+                            </View>
+                        ))
+                    ) : (
+                        <Text style={styles.noComments}>No comments yet.</Text>
+                    )}
+                </ScrollView> */}
             </View>
         </View>
     );
@@ -78,9 +105,13 @@ const styles = StyleSheet.create({
     },
     expandedSection: {
         marginTop: 10,
-        borderTopWidth: 1,
-        borderTopColor: "#ddd",
         paddingTop: 10,
+    },
+    commentcard: {
+        padding: 6,
+        borderColor: "#ccc",
+        borderWidth: 1,
+        borderRadius: 8,
     },
     commentInput: {
         borderColor: "#ccc",
@@ -89,16 +120,40 @@ const styles = StyleSheet.create({
         padding: 8,
         marginTop: 8,
         marginBottom: 8,
+        height: 80,
     },
     buttonContainer: {
         alignItems: "flex-end",
         justifyContent: "center",
     },
     saveButton: {
-        backgroundColor: "black",
+        backgroundColor: "#7b68ee",
         width: "20%",
         marginTop: 8,
         marginBottom: 10,
+    },
+    commentsContainer: {
+        marginTop: 16,
+        borderTopWidth: 1,
+        borderTopColor: "#ddd",
+        paddingTop: 10,
+    },
+    commentItem: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginBottom: 8,
+    },
+    userIcon: {
+        marginRight: 8,
+        fontSize: 18,
+    },
+    commentText: {
+        fontSize: 16,
+        color: "#333",
+    },
+    noComments: {
+        fontStyle: "italic",
+        color: "#777",
     },
 });
 

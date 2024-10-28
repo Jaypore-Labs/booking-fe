@@ -34,3 +34,12 @@ export const fetchAvailableApartments = async (checkIn, checkOut) => {
             console.error("Error fetching available apartments:", error)
         );
 };
+
+export const fetchAvailableApartmentsDate = async (checkIn, checkOut) => {
+    return axiosInstance
+        .get(`/apartments/available-dates`, { params: { checkIn, checkOut } })
+        .then((res) => res.data)
+        .catch((error) =>
+            console.error("Error fetching available apartments Date:", error)
+        );
+};

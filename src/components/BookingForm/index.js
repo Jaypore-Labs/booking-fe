@@ -19,6 +19,7 @@ import { FlashAlert } from "../FlashAlert";
 import { setBookings } from "../../store/actions";
 import Button from "../Button";
 import { Formik } from "formik";
+import Header from "../Header";
 import * as Yup from "yup";
 
 const BookingSchema = Yup.object().shape({
@@ -62,7 +63,7 @@ export default function BookingForm() {
         try {
             if (toDate < fromDate) {
                 FlashAlert({
-                    title: "Check-out date must be after check-in date.",
+                    title: "from date must be after to date.",
                     error: true,
                 });
                 return;
@@ -192,8 +193,36 @@ export default function BookingForm() {
             });
     }, []);
 
+    const minimumToDate = new Date(fromDate);
+    minimumToDate.setDate(fromDate.getDate() + 1);
+
+    const handleFromDateChange = (event, selectedDate) => {
+        setShowFromDatePicker(false);
+        if (selectedDate) {
+            setFromDate(selectedDate);
+            if (toDate < selectedDate) {
+                setToDate(selectedDate);
+            }
+        }
+        setShowFromDatePicker(false);
+        // if (selectedDate) setFromDate(selectedDate);
+    };
+
+    const handleToDateChange = (event, selectedDate) => {
+        setShowToDatePicker(false);
+        if (selectedDate) {
+            if (selectedDate > fromDate) {
+                setToDate(selectedDate);
+            } else {
+                alert("from date must be after to date.");
+            }
+        }
+        setShowToDatePicker(false);
+        // if (selectedDate) setToDate(selectedDate);
+    };
     return (
         <SafeAreaView style={{ flex: 1 }}>
+            <Header title="Booking Form" />
             <ScrollView contentContainerStyle={styles.container}>
                 <Formik
                     initialValues={{
@@ -228,10 +257,9 @@ export default function BookingForm() {
                                 <DateTimePicker
                                     value={fromDate}
                                     mode="date"
-                                    onChange={(event, selectedDate) => {
-                                        setShowFromDatePicker(false);
-                                        if (selectedDate) setFromDate(selectedDate);
-                                    }}
+                                    onChange={handleFromDateChange}
+                                    display="default"
+                                    minimumDate={new Date()}
                                 />
                             )}
 
@@ -246,19 +274,21 @@ export default function BookingForm() {
                                 <DateTimePicker
                                     value={toDate}
                                     mode="date"
-                                    onChange={(event, selectedDate) => {
-                                        setShowToDatePicker(false);
-                                        if (selectedDate) setToDate(selectedDate);
-                                    }}
+                                    display="default"
+                                    onChange={handleToDateChange}
+                                    minimumDate={minimumToDate}
                                 />
                             )}
 
                             {!booking && (
-                                <Button
-                                    title="Check Availability"
-                                    onPress={checkAvailability}
-                                    loader={loader}
-                                />
+                                <View style={styles.buttonContainer}>
+                                    <Button
+                                        title="Check Availability"
+                                        onPress={checkAvailability}
+                                        loader={loader}
+                                        style={{ width: "100%" }}
+                                    />
+                                </View>
                             )}
 
                             {isFormEnabled && (
@@ -382,12 +412,14 @@ export default function BookingForm() {
                                     {touched.phone && errors.phone && (
                                         <Text style={styles.error}>{errors.phone}</Text>
                                     )}
-
-                                    <Button
-                                        title="Save"
-                                        loader={loader}
-                                        onPress={() => handleSubmit()}
-                                    />
+                                    <View style={styles.buttonContainer}>
+                                        <Button
+                                            title="Save"
+                                            loader={loader}
+                                            onPress={() => handleSubmit()}
+                                            style={{ width: "100%" }}
+                                        />
+                                    </View>
                                 </>
                             )}
                         </View>
@@ -402,11 +434,14 @@ const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
         padding: 16,
+        backgroundColor: "#fff",
     },
     form: {
         backgroundColor: "#fff",
         padding: 20,
         borderRadius: 10,
+        borderWidth: 1,
+        borderColor: "#dcdcdc",
     },
     label: {
         fontSize: 16,
@@ -435,6 +470,10 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         padding: 12,
         marginBottom: 12,
+    },
+    buttonContainer: {
+        marginVertical: 16,
+        alignItems: "center",
     },
     dateText: {
         color: "#333",

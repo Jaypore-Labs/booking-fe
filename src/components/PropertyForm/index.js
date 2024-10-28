@@ -7,18 +7,23 @@ import {
     StyleSheet,
     ScrollView,
     SafeAreaView,
+    KeyboardAvoidingView,
+    Dimensions,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import Button from "../Button";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import Header from "../Header";
 import {
     createApartment,
     updateApartment,
 } from "../../endpoints/apartment.service";
 import { setApartments } from "../../store/actions";
 import { FlashAlert } from "../../components/FlashAlert";
+import colors from "../../config/colors";
 
 export default function PropertyForm() {
     const navigation = useNavigation();
@@ -94,6 +99,7 @@ export default function PropertyForm() {
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
+            <Header title="Property Form" />
             <ScrollView contentContainerStyle={styles.container}>
                 <Formik
                     initialValues={{
@@ -158,17 +164,15 @@ export default function PropertyForm() {
                             )}
 
                             <Text style={styles.labeltext}>Type</Text>
-                            <TextInput
-                                value={values.type}
-                                onChangeText={handleChange("type")}
-                                onBlur={handleBlur("type")}
-                                style={[
-                                    styles.input,
-                                    touched.type && errors.type ? styles.inputError : {},
-                                ]}
-                                placeholder="e.g., studio, 1bed, 2bed"
-                                placeholderTextColor="#aaa"
-                            />
+                            <Picker
+                                selectedValue={values.type}
+                                onValueChange={handleChange("type")}
+                                style={styles.input}
+                            >
+                                <Picker.Item label="Studio" value="studio" />
+                                <Picker.Item label="1 Bed" value="1bed" />
+                                <Picker.Item label="2 Bed" value="2bed" />
+                            </Picker>
                             {touched.type && errors.type && (
                                 <Text style={styles.error}>{errors.type}</Text>
                             )}
@@ -193,20 +197,20 @@ export default function PropertyForm() {
 
                             <View style={styles.switchContainer}>
                                 <Text style={styles.labeltext}>Active</Text>
-                                <Switch value={isActive} onValueChange={setIsActive} />
+                                <Switch
+                                    value={isActive}
+                                    onValueChange={setIsActive}
+                                    trackColor={{ false: "#D9DBDC", true: "#7b68ee" }}
+                                    thumbColor={isActive ? "#ffffff" : "#f4f3f4"}
+                                />
                             </View>
-                            <View
-                                style={{
-                                    width: "100%",
-                                    alignItems: "center",
-                                    marginTop: 20,
-                                }}
-                            >
+                            <View style={styles.buttonContainer}>
                                 <Button
                                     title="Save"
                                     loader={loader}
                                     onPress={() => handleSubmit()}
                                     disabled={loader}
+                                    style={{ width: "100%" }}
                                 />
                             </View>
                         </View>
@@ -233,6 +237,18 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 6,
         elevation: 3,
+    },
+    container: {
+        flexGrow: 1,
+        padding: 16,
+        backgroundColor: "#fff",
+    },
+    form: {
+        backgroundColor: "#fff",
+        padding: 20,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: "#dcdcdc",
     },
     labeltext: {
         fontSize: 16,
@@ -261,6 +277,10 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
         marginBottom: 12,
+    },
+    buttonContainer: {
+        marginTop: 20,
+        alignItems: "center",
     },
     button: {
         alignItems: "center",

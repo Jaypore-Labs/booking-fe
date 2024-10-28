@@ -7,6 +7,7 @@ import {
     FlatList,
     Pressable,
     StyleSheet,
+    TouchableOpacity,
 } from "react-native";
 import Button from "../Button";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,6 +15,9 @@ import { fetchBooking, deleteBooking } from "../../endpoints/booking.service";
 import { fetchApartmentById } from "../../endpoints/apartment.service";
 import { FlashAlert } from "../FlashAlert";
 import { setBookings } from "../../store/actions/booking";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import Header from "../Header";
+import colors from "../../config/colors";
 
 export default function BookingsList({ navigation }) {
     const dispatch = useDispatch();
@@ -105,6 +109,7 @@ export default function BookingsList({ navigation }) {
     );
     return (
         <SafeAreaView style={styles.safeArea}>
+            <Header title="Bookings" />
             <View style={styles.addButtonContainer}>
                 <Button
                     title={"Add Booking"}
@@ -119,35 +124,58 @@ export default function BookingsList({ navigation }) {
                         keyExtractor={(item) => item.id.toString()}
                         renderItem={({ item }) => (
                             <View style={styles.bookingCard}>
-                                <Text>
+                                <Text style={styles.name}>
                                     Name: {apartments[item.apartmentId] || "Loading..."}
                                 </Text>
-                                <Text>Price: {item.price}</Text>
-                                <Text>Deposit: {item.deposit}</Text>
-                                <Text>Description: {item.description}</Text>
-                                <Text>Check-In: {formatDate(item.checkIn)}</Text>
-                                <Text>Check-Out: {formatDate(item.checkOut)}</Text>
-                                <Text>Customer Name: {item.customerDetail?.name}</Text>
-                                <Text>Phone No: {item.customerDetail?.phone}</Text>
-                                <View style={styles.buttonContainer}>
-                                    <Pressable
-                                        style={styles.button}
+                                <Text style={styles.price}>Price: {item.price}</Text>
+                                <Text style={styles.light}>Deposit: {item.deposit}</Text>
+                                <Text style={styles.light}>
+                                    Description: {item.description}
+                                </Text>
+                                <Text style={styles.date}>
+                                    Check-In: {formatDate(item.checkIn)}
+                                </Text>
+                                <Text style={styles.date}>
+                                    Check-Out: {formatDate(item.checkOut)}
+                                </Text>
+                                <Text style={styles.detail}>
+                                    Customer Name: {item.customerDetail?.name}
+                                </Text>
+                                <Text style={styles.detail}>
+                                    Phone No: {item.customerDetail?.phone}
+                                </Text>
+
+                                <View style={styles.buttonRow}>
+                                    <TouchableOpacity
+                                        style={[styles.button, styles.editButton]}
                                         onPress={() => updateBooking(item)}
                                     >
-                                        <Text style={styles.buttonText}>EDIT</Text>
-                                    </Pressable>
-                                    <Pressable
-                                        style={styles.button}
+                                        <Icon
+                                            name="edit"
+                                            size={16}
+                                            color="#fff"
+                                            style={styles.icon}
+                                        />
+                                        <Text style={styles.text}>Edit</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={[styles.button, styles.deleteButton]}
                                         onPress={() => _deleteBooking(item.id)}
                                     >
-                                        <Text style={styles.buttonText}>DEL</Text>
-                                    </Pressable>
+                                        <Icon
+                                            name="delete"
+                                            size={16}
+                                            color="#fff"
+                                            style={styles.icon}
+                                        />
+                                        <Text style={styles.text}>Delete</Text>
+                                    </TouchableOpacity>
                                 </View>
                             </View>
                         )}
                     />
                 ) : (
-                    <Text>No Booking Available</Text>
+                    <Text style={{ textAlign: "center" }}>No Booking Available</Text>
                 )}
             </View>
         </SafeAreaView>
@@ -161,18 +189,20 @@ const styles = StyleSheet.create({
     },
     addButtonContainer: {
         alignItems: "center",
-        marginTop: 40,
+        // marginTop: 40,
     },
     addButton: {
-        backgroundColor: "#000000",
+        backgroundColor: colors.primary,
     },
     container: {
         flex: 1,
-        padding: 20,
+        padding: 18,
     },
     bookingCard: {
-        padding: 16,
-        backgroundColor: "#E9EAEC",
+        padding: 14,
+        backgroundColor: "#ffffff",
+        borderColor: "#E9EAEC",
+        borderWidth: 1,
         margin: 10,
         borderRadius: 10,
         elevation: 1,
@@ -182,17 +212,73 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "flex-end",
     },
+    buttonRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-end",
+    },
+    price: {
+        fontSize: 14,
+        fontWeight: "bold",
+        color: "#3E904A",
+    },
+    name: {
+        fontSize: 16,
+        color: "#000000",
+        fontWeight: "600",
+    },
+    light: {
+        fontSize: 14,
+        color: "#000000",
+        fontWeight: "600",
+    },
+    date: {
+        fontSize: 14,
+        color: "#000000",
+        fontWeight: "600",
+    },
+    detail: {
+        fontSize: 12,
+        color: "grey",
+        fontWeight: "600",
+    },
+    button: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderRadius: 6,
+        marginHorizontal: 5,
+        elevation: 2,
+    },
+    icon: {
+        marginRight: 6,
+    },
+    editButton: {
+        backgroundColor: colors.primary,
+    },
+    deleteButton: {
+        backgroundColor: "#808080",
+    },
     button: {
         alignItems: "center",
         justifyContent: "center",
         paddingVertical: 6,
         paddingHorizontal: 15,
-        borderRadius: 6,
+        borderRadius: 4,
+        elevation: 3,
         margin: 6,
         backgroundColor: "#3E904A",
-        elevation: 3,
     },
     buttonText: {
+        fontSize: 12,
+        lineHeight: 21,
+        fontWeight: "bold",
+        letterSpacing: 0.25,
+        color: "white",
+    },
+    text: {
         fontSize: 12,
         lineHeight: 21,
         fontWeight: "bold",

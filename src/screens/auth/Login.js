@@ -25,6 +25,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { loginUser } from "../../endpoints/auth";
 import { registerForPushNotificationsAsync } from "../../services/notification";
 import { updateUser } from "../../endpoints/user.service";
+import Icon from "react-native-vector-icons/MaterialIcons";
 
 export default function Login() {
     const navigation = useNavigation();
@@ -98,8 +99,10 @@ export default function Login() {
         <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
             <KeyboardAvoidingView style={{ flex: 1 }}>
                 <View style={styles.wrapper}>
-                    <ScrollView style={{ flexGrow: 1 }}>
-                        <Text style={styles.heading}>Welcome to Kings</Text>
+                    <ScrollView style={{ flexGrow: 1, paddingHorizontal: 16 }}>
+                        <Text style={styles.heading}>
+                            Welcome to Kings Holiday Apartments
+                        </Text>
                         <View style={{ width: "78%", marginBottom: 30 }}>
                             <Text>Log in via Email </Text>
                         </View>
@@ -155,7 +158,7 @@ export default function Login() {
                                                     borderWidth: 0.5,
                                                     borderColor: focus
                                                         ? colors.primary
-                                                        : touched.password && errors.password
+                                                        : errors.password && touched.password
                                                             ? "rgba(241,84,63,0.9)"
                                                             : colors.light,
                                                 }}
@@ -215,8 +218,8 @@ export default function Login() {
                                                         // position: "absolute",
                                                         // top: 58,
                                                         // left: 4,
-                                                        // color: colors.danger,
-                                                        color: colors.para,
+                                                        color: colors.danger,
+                                                        // color: colors.para,
                                                         fontSize: 12,
                                                         marginTop: 2,
                                                         marginBottom: 2,
@@ -248,8 +251,9 @@ export default function Login() {
                                 flex: 1,
                                 justifyContent: "center",
                                 alignItems: "center",
-                                paddingHorizontal: 10,
+                                // paddingHorizontal: 10,
                                 paddingVertical: 5,
+                                marginTop: 14,
                             }}
                         >
                             <TouchableOpacity
@@ -257,6 +261,7 @@ export default function Login() {
                                     flex: 1,
                                     flexDirection: "row",
                                     justifyContent: "center",
+                                    alignItems: "center",
                                     backgroundColor: colors.lightDisabled,
                                     width: "100%",
                                     // justifyContent: "space-around",
@@ -266,13 +271,14 @@ export default function Login() {
                                 }}
                                 onPress={() => navigation.navigate("signup")}
                             >
+                                {/* <Icon name="email" size={20} color="#000000" /> */}
                                 <Text
                                     style={{
-                                        alignItems: "center",
                                         marginTop: 2,
                                         fontWeight: "600",
                                         flex: 5,
                                         textAlign: "center",
+                                        alignItems: "center",
                                         color: colors.primary,
                                     }}
                                 >

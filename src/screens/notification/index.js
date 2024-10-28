@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
         textAlign: "center",
     },
     notifications: {
-        marginTop: 20,
+        marginTop: 2,
     },
     notificationItem: {
         flexDirection: "row",

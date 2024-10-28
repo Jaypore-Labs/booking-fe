@@ -10,16 +10,12 @@ export default function BookingsPage() {
             <Stack.Screen
                 name="BookingsList"
                 component={BookingsList}
-                options={{
-                    title: "Bookings",
-                    headerShown: true,
-                    headerLeft: () => null,
-                }}
+                options={{ headerShown: false }}
             />
             <Stack.Screen
                 name="BookingForm"
                 component={BookingForm}
-                options={{ title: "Booking Form" }}
+                options={{ headerShown: false }}
             />
         </Stack.Navigator>
     );

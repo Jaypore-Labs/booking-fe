@@ -1,6 +1,9 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import PropertyList from "../../../../components/PropertyList";
 import PropertyForm from "../../../../components/PropertyForm";
+import { Pressable } from "react-native";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import colors from "../../../../config/colors";
 
 const Stack = createStackNavigator();
 
@@ -10,16 +13,12 @@ export default function PropertiesPage() {
             <Stack.Screen
                 name="PropertyList"
                 component={PropertyList}
-                options={{
-                    title: "Property List",
-                    headerShown: true,
-                    headerLeft: () => null,
-                }}
+                options={{ headerShown: false }}
             />
             <Stack.Screen
                 name="PropertyForm"
                 component={PropertyForm}
-                options={{ title: "Property form" }}
+                options={{ headerShown: false }}
             />
         </Stack.Navigator>
     );

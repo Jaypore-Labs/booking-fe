@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -8,9 +8,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
+  Animated,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
-import { fetchAvailableApartments } from "../../../../endpoints/apartment.service";
+import { fetchAvailableApartmentsDate } from "../../../../endpoints/apartment.service";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 const generateDateRange = (startDate, endDate) => {
@@ -18,6 +19,7 @@ const generateDateRange = (startDate, endDate) => {
   let currentDate = new Date(startDate);
   const lastDate = new Date(endDate);
 
+  // Loop through the date range
   while (currentDate <= lastDate) {
     dates.push(new Date(currentDate).toISOString().split("T")[0]);
     currentDate.setDate(currentDate.getDate() + 1);
@@ -35,68 +37,72 @@ const ApartmentList = () => {
   const [showFromDatePicker, setShowFromDatePicker] = useState(false);
   const [showToDatePicker, setShowToDatePicker] = useState(false);
 
-  const _fetchAvailableApartments = async () => {
+  const scrollX = useRef(new Animated.Value(0)).current;
+  const headerScrollRef = useRef(null); // Ref for the header scroll views
+  const contentScrollRefs = useRef([]);
+
+  const _fetchAvailableApartmentsDate = async () => {
     try {
-      const start = startDate.toISOString();
+      const checkIn = startDate.toISOString();
       const checkOut = endDate.toISOString();
-      const apartments = await fetchAvailableApartments(start, checkOut);
+      const apartments = await fetchAvailableApartmentsDate(checkIn, checkOut);
       setAvailableApt(apartments);
     } catch (error) {
-      console.error("Error fetching available apartments:", error);
+      console.error("Error fetching available apartments Date:", error);
     }
   };
 
   const generateFullDateRange = () => {
-    const currentDate = new Date();
-    const start = new Date();
-    start.setMonth(currentDate.getMonth() - 2);
-    const end = new Date();
-    end.setMonth(currentDate.getMonth() + 2);
-
-    return generateDateRange(start, end);
+    return generateDateRange(startDate, endDate);
   };
 
+  const minimumEndDate = new Date(startDate);
+  minimumEndDate.setDate(startDate.getDate() + 1);
+
   const handleStartDateChange = (event, selectedDate) => {
-    setShowFromDatePicker(false); // Hide picker
-    if (selectedDate) setStartDate(selectedDate);
+    setShowFromDatePicker(false);
+    if (selectedDate) {
+      setStartDate(selectedDate);
+      if (endDate < selectedDate) {
+        setEndDate(selectedDate);
+      }
+    }
+    setShowFromDatePicker(false);
+    // if (selectedDate) setStartDate(selectedDate);
   };
 
   const handleEndDateChange = (event, selectedDate) => {
-    setShowToDatePicker(false); // Hide picker
-    if (selectedDate) setEndDate(selectedDate);
+    setShowToDatePicker(false);
+    if (selectedDate) {
+      if (selectedDate > startDate) {
+        setEndDate(selectedDate);
+      } else {
+        alert("from date must be after to date.");
+      }
+    }
+    setShowToDatePicker(false);
+    // if (selectedDate) setEndDate(selectedDate);
   };
 
-  useEffect(() => {
-    _fetchAvailableApartments();
-  }, [startDate, endDate]);
-
-  const renderApartmentRow = ({ item }) => (
-    <View style={styles.apartmentRow}>
-      <Text style={styles.apartmentName}>{item.name}</Text>
-
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        {generateFullDateRange()
-          .slice(0, visibleDays)
-          .map((date, index) => (
-            <View
-              key={index}
-              style={[
-                styles.availabilityItem,
-                item.isActive ? styles.available : styles.unavailable,
-              ]}
-            >
-              <Text style={styles.tick}>{item.isActive ? "✓" : ""}</Text>
-            </View>
-          ))}
-      </ScrollView>
-    </View>
-  );
-
-  // Render the header with apartment name and dates
+  const handleScrollSync = (scrollEvent) => {
+    const offsetX = scrollEvent.nativeEvent.contentOffset.x;
+    headerScrollRef.current?.scrollTo({ x: offsetX, animated: false });
+    contentScrollRefs.current.forEach((ref) => {
+      ref?.scrollTo({ x: offsetX, animated: false });
+    });
+  };
+  // Render the header with dates and synchronize scrolling
   const renderHeader = () => (
     <View style={styles.headerRow}>
       <Text style={styles.headerText}>Apt Name</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      <Animated.ScrollView
+        ref={headerScrollRef}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        scrollEventThrottle={16}
+        onMomentumScrollEnd={handleScrollSync}
+      // onScroll={handleScrollSync}
+      >
         {generateFullDateRange()
           .slice(0, visibleDays)
           .map((date, index) => (
@@ -104,13 +110,51 @@ const ApartmentList = () => {
               {date.split("-")[2]}/{date.split("-")[1]}
             </Text>
           ))}
-      </ScrollView>
+      </Animated.ScrollView>
+    </View>
+  );
+
+  // Render each apartment row and synchronize scrolling
+  const renderApartmentRow = ({ item, index }) => (
+    <View style={styles.apartmentRow}>
+      <Text style={styles.apartmentName}>{item.name}</Text>
+
+      <Animated.ScrollView
+        ref={(ref) => (contentScrollRefs.current[index] = ref)}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        scrollEventThrottle={16}
+        scrollEnabled={true} // Enable scrolling
+        onMomentumScrollEnd={handleScrollSync}
+        onScroll={handleScrollSync}
+      >
+        {generateFullDateRange()
+          .slice(0, visibleDays)
+          .map((date, dateIndex) => {
+            console.log(date);
+            console.log(item.availability);
+            const isAvailable = item.availability[date] ?? null;
+            console.log(isAvailable);
+            return (
+              <View
+                key={dateIndex}
+                style={[
+                  styles.availabilityItem,
+                  isAvailable === true ? styles.available : styles.unavailable,
+                ]}
+              >
+                <Text style={styles.tick}>
+                  {isAvailable === true ? "✓" : "✗"}
+                </Text>
+              </View>
+            );
+          })}
+      </Animated.ScrollView>
     </View>
   );
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Date Range Picker */}
       <View style={styles.datecard}>
         <TouchableOpacity
           onPress={() => setShowAvailable(!showAvailable)}
@@ -128,14 +172,14 @@ const ApartmentList = () => {
 
         <TouchableOpacity
           style={{ marginLeft: 14 }}
-          onPress={_fetchAvailableApartments}
+          onPress={_fetchAvailableApartmentsDate}
         >
           <Icon name="search" size={28} color="#000000" />
         </TouchableOpacity>
       </View>
 
       {showAvailable && (
-        <View>
+        <View style={{ padding: 16 }}>
           <View style={styles.datePickerContainer}>
             <Text>From:</Text>
             <TouchableOpacity
@@ -150,6 +194,7 @@ const ApartmentList = () => {
                 mode="date"
                 display="default"
                 onChange={handleStartDateChange}
+                minimumDate={new Date()}
               />
             )}
           </View>
@@ -168,6 +213,7 @@ const ApartmentList = () => {
                 mode="date"
                 display="default"
                 onChange={handleEndDateChange}
+                minimumDate={minimumEndDate}
               />
             )}
           </View>
@@ -175,16 +221,18 @@ const ApartmentList = () => {
       )}
 
       {availableApt.length > 0 ? (
-        <>
+        <View style={{ padding: 20 }}>
           {renderHeader()}
           <FlatList
             data={availableApt}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item) => item._id}
             renderItem={renderApartmentRow}
           />
-        </>
+        </View>
       ) : (
-        <Text style={{ textAlign: "center" }}>Apartment not found</Text>
+        <Text style={{ textAlign: "center", marginTop: 6 }}>
+          Apartment not found
+        </Text>
       )}
     </SafeAreaView>
   );
@@ -200,7 +248,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    padding: 16,
+    padding: 6,
   },
   dateBox: {
     padding: 15,
@@ -210,7 +258,7 @@ const styles = StyleSheet.create({
   },
   dropdownHeader: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-evenly",
     alignItems: "center",
   },
   dropdownText: {
@@ -218,13 +266,18 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   datePickerContainer: {
-    marginVertical: 10,
+    marginVertical: 4,
+    flexDirection: "row", // Arrange in a row
+    justifyContent: "space-between", // Add spacing
+    alignItems: "center",
   },
   dateButton: {
     padding: 10,
     backgroundColor: "#E9EAEC",
     borderRadius: 5,
     marginTop: 5,
+    width: 150, // Adjust width to reduce size
+    marginHorizontal: 10,
   },
   headerRow: {
     flexDirection: "row",
@@ -266,7 +319,7 @@ const styles = StyleSheet.create({
   },
   tick: {
     fontSize: 16,
-    color: "#fff",
+    color: "#000000",
   },
   available: {
     backgroundColor: "#7b68ee",

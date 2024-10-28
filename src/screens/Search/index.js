@@ -10,10 +10,12 @@ import {
     FlatList,
     Platform,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { fetchApartment } from "../../endpoints/apartment.service";
 import { useDispatch, useSelector } from "react-redux";
 import { setApartments } from "../../store/actions";
+import Header from "../../components/Header";
 
 export default function Search() {
     const dispatch = useDispatch();
@@ -21,6 +23,7 @@ export default function Search() {
     const [filteredData, setFilteredData] = useState(apartments);
     const [searchQuery, setSearchQuery] = useState("");
     const [loader, setLoader] = useState(false);
+    const { navigate } = useNavigation();
 
     React.useEffect(() => {
         _fetchApartment();
@@ -83,9 +86,14 @@ export default function Search() {
         setSearchQuery(text);
         debouncedSearch(text);
     };
-
+    const handleApartmentPress = (item) => {
+        navigate("apartmentDetails", {
+            apartment: item,
+        });
+    };
     return (
         <SafeAreaView style={styles.safeArea}>
+            <Header title="Search Apartments" navigation="home" />
             <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 style={styles.container}
@@ -109,20 +117,29 @@ export default function Search() {
                             data={filteredData}
                             keyExtractor={(item) => item.id.toString()}
                             renderItem={({ item }) => (
-                                <View style={styles.card}>
-                                    <Text style={styles.price}>
-                                        {"\u20B9"}
-                                        {item.price}/DAY
-                                    </Text>
-                                    <Text style={styles.name}>{item.name}</Text>
-                                    <View style={styles.cardRow}>
-                                        <Icon name="bed" size={18} color="#C5C5C5" />
-                                        <Text style={styles.typeText}>{item.type}</Text>
-                                        <Text style={styles.status}>
-                                            {item.active ? "Active" : "Inactive"}
+                                <TouchableOpacity onPress={() => handleApartmentPress(item)}>
+                                    <View style={styles.propertyCard}>
+                                        <View style={styles.propertyInfoRow}>
+                                            <Text style={styles.name}>Name: {item.name}</Text>
+                                            <Text style={styles.price}>
+                                                Price: {"\u20B9"}
+                                                {item.price}/DAY
+                                            </Text>
+                                        </View>
+                                        <Text style={styles.typetext}>Type: {item.type}</Text>
+                                        <Text
+                                            style={[
+                                                styles.typetext,
+                                                {
+                                                    color: item.isActive ? "#3E904A" : "#FF0000",
+                                                },
+                                            ]}
+                                        >
+                                            Status: {item.isActive ? "Active" : "Inactive"}
                                         </Text>
+                                        <Text style={styles.comments}>{item.description}</Text>
                                     </View>
-                                </View>
+                                </TouchableOpacity>
                             )}
                         />
                     )}
@@ -165,37 +182,57 @@ const styles = StyleSheet.create({
         textAlign: "center",
         marginTop: 20,
     },
-    card: {
-        padding: 16,
-        backgroundColor: "#f8f9fa",
+    propertyCard: {
+        padding: 14,
+        backgroundColor: "#FFFFFF",
+        borderColor: "#E9EAEC",
+        borderWidth: 1,
         margin: 10,
         borderRadius: 10,
         elevation: 1,
     },
+    propertyInfoRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+    },
     price: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: "bold",
         color: "#3E904A",
     },
     name: {
-        fontSize: 14,
-        color: "#000",
+        fontSize: 16,
+        color: "#000000",
         fontWeight: "600",
     },
-    cardRow: {
+    comments: {
+        fontSize: 10,
+        color: "grey",
+    },
+    typetext: {
+        marginVertical: 2,
+        fontSize: 14,
+        color: "#808080",
+    },
+    propertyStatusRow: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "flex-start",
-        marginVertical: 6,
     },
-    typeText: {
-        fontSize: 11,
-        color: "grey",
-        marginHorizontal: 6,
+    buttonRow: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-end",
     },
-    status: {
-        fontSize: 11,
-        color: "grey",
-        marginHorizontal: 6,
+    button: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        paddingVertical: 8,
+        paddingHorizontal: 12,
+        borderRadius: 6,
+        marginHorizontal: 5,
+        elevation: 2,
     },
 });
