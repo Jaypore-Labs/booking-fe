@@ -7,6 +7,8 @@ import {
     Text,
     StyleSheet,
     KeyboardAvoidingView,
+    FlatList,
+    ActivityIndicator,
 } from "react-native";
 import Header from "../../components/Header";
 import * as Notifications from "expo-notifications";
@@ -19,12 +21,24 @@ import { FlashAlert } from "../../components/FlashAlert";
 export default function Notification() {
     const [notifications, setNotifications] = useState([]);
     const [loader, setLoader] = useState(false);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const limit = 5;
 
-    const _fetchNotifications = async () => {
+    const _fetchNotifications = async (page = 1) => {
         try {
             setLoader(true);
-            const result = await getNotifications();
-            setNotifications(result.results);
+            const result = await getNotifications({
+                page,
+                limit,
+                sortBy: "createdAt:desc",
+            });
+            setNotifications((prevNotifications) =>
+                page === 1 ? result.results : [...prevNotifications, ...result.results]
+            );
+            setHasMore(
+                result.totalResults > notifications.length + result.results.length
+            );
         } catch (error) {
             FlashAlert({
                 title: e?.message || "Something went wrong. Try again later.",
@@ -58,47 +72,78 @@ export default function Notification() {
         return () => subscription.remove();
     }, []);
 
+    const handleLoadMore = () => {
+        if (hasMore && !loader) {
+            setPage((prevPage) => prevPage + 1);
+            _fetchNotifications(page + 1);
+        }
+    };
+    const formatDate = (date) => {
+        const options = {
+            day: "2-digit",
+            month: "2-digit",
+            year: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+        };
+        return new Date(date).toLocaleString("en-GB", options).replace(",", "");
+    };
+
     return (
         <SafeAreaView style={styles.safeArea}>
-            <KeyboardAvoidingView style={{ flex: 1 }}>
-                <View>
+            <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
+                <View style={{ flex: 1 }}>
                     <Header title={"Notifications"} />
-                    <ScrollView contentContainerStyle={styles.scrollView}>
-                        <View style={styles.container}>
-                            {notifications && notifications.length > 0 ? (
-                                <View style={styles.notifications}>
-                                    {notifications.map((notification) => (
-                                        <TouchableOpacity
-                                            key={notification.id}
-                                            onPress={() => handleNotificationClick(notification.id)}
-                                            style={[
-                                                styles.notificationItem,
-                                                {
-                                                    backgroundColor: notification.read
-                                                        ? "lightblue"
-                                                        : "#f8f9fa",
-                                                },
-                                            ]}
+                    {notifications && notifications.length > 0 ? (
+                        <FlatList
+                            data={notifications}
+                            keyExtractor={(item) => item.id.toString()}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity
+                                    onPress={() => handleNotificationClick(item.id)}
+                                    style={[
+                                        styles.notificationItem,
+                                        {
+                                            backgroundColor: item.read ? "lightblue" : "#f8f9fa",
+                                        },
+                                    ]}
+                                >
+                                    <View style={styles.notificationhead}>
+                                        <Icon
+                                            name="notifications"
+                                            size={20}
+                                            color="#000"
+                                            style={styles.icon}
+                                        />
+                                        <Text
+                                            style={[styles.notificationText, { fontWeight: "bold" }]}
                                         >
-                                            <Icon
-                                                name="notifications"
-                                                size={20}
-                                                color="#000"
-                                                style={styles.icon}
-                                            />
-                                            <Text style={styles.notificationText}>
-                                                {notification.message}
-                                            </Text>
-                                        </TouchableOpacity>
-                                    ))}
-                                </View>
-                            ) : (
-                                <Text style={styles.noNotificationText}>
-                                    No notifications found
-                                </Text>
+                                            {item.messageBy || "Anonymous"}
+                                        </Text>
+                                    </View>
+                                    <View style={styles.notificationContent}>
+                                        <Text style={styles.notificationText}>{item.message}</Text>
+                                        <Text style={styles.time}>
+                                            {formatDate(item.timestamp)}
+                                        </Text>
+                                    </View>
+                                </TouchableOpacity>
                             )}
-                        </View>
-                    </ScrollView>
+                            contentContainerStyle={styles.scrollView}
+                            onEndReached={handleLoadMore}
+                            onEndReachedThreshold={0.5}
+                            ListFooterComponent={
+                                loader ? (
+                                    <ActivityIndicator size="small" color="#0000ff" />
+                                ) : null
+                            }
+                        />
+                    ) : (
+                        <Text style={styles.noNotificationText}>
+                            No notifications found
+                        </Text>
+                    )}
                 </View>
             </KeyboardAvoidingView>
         </SafeAreaView>
@@ -111,24 +156,13 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
     },
     scrollView: {
-        flexGrow: 1,
-    },
-    container: {
-        flex: 1,
         padding: 16,
-    },
-
-    title: {
-        fontSize: 24,
-        marginBottom: 16,
-        textAlign: "center",
-    },
-    notifications: {
-        marginTop: 2,
+        flexGrow: 1,
+        paddingBottom: 20,
     },
     notificationItem: {
-        flexDirection: "row",
-        alignItems: "center",
+        // flexDirection: "row",
+        flexDirection: "column",
         margin: 10,
         padding: 10,
         borderColor: "#ccc",
@@ -136,21 +170,37 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         backgroundColor: "#f8f9fa",
         flexWrap: "wrap",
-        alignSelf: "stretch",
+        marginVertical: 8,
+    },
+    notificationhead: {
+        flex: 1, //
+        flexDirection: "row",
+        alignItems: "center",
+    },
+    notificationContent: {
+        flex: 1, //
+        flexDirection: "row",
+        justifyContent: "space-between",
+        // alignItems: "center",
     },
     icon: {
         marginRight: 10,
     },
     notificationText: {
-        fontSize: 16,
-        color: "#333",
-        flexShrink: 1,
-        flexWrap: "wrap",
+        color: "#000000",
         flex: 1,
+        fontSize: 14,
+        marginRight: 8,
+        flexWrap: "wrap",
+    },
+    time: {
+        fontSize: 12,
+        marginLeft: 10,
+        color: "#777",
     },
     noNotificationText: {
         textAlign: "center",
-        fontSize: 16,
+        fontSize: 14,
         color: "#6C757D",
         fontWeight: "500",
     },

@@ -16,7 +16,7 @@ const ApartmentDropdown = ({ apartment, name }) => {
         const getComments = async () => {
             try {
                 const response = await fetchComments(apartment.apartmentId, userId);
-                setComments(response?.results);
+                setComments(response?.results || []);
             } catch (error) {
                 console.error("Error fetching comments:", error);
             }
@@ -36,16 +36,27 @@ const ApartmentDropdown = ({ apartment, name }) => {
             return;
         }
         setLoader(true);
-        const timestamp = new Date().toLocaleString();
+        const timestamp = new Date();
+        const commentBy = user?.name;
         try {
             const res = await createComment({
-                text: `${timestamp}: ${comment} (By ${name})`,
+                text: comment,
                 userId: userId,
                 postId: id,
+                name: commentBy,
+                timestamp: timestamp.toISOString(),
             });
             if (res) {
+                setComments((prevComments) => [
+                    ...prevComments,
+                    {
+                        text: comment,
+                        name: commentBy,
+                        timestamp: timestamp.toISOString(),
+                    }, // New comment structure
+                ]);
                 setComment("");
-                // setComments([...comments, newComment]);
+
                 FlashAlert({ title: "Comment created successfully" });
             }
         } catch (error) {
@@ -62,6 +73,17 @@ const ApartmentDropdown = ({ apartment, name }) => {
 
     const filterCommentText = (commentText) => {
         return commentText.replace(/\s*\(By.*\)$/, "");
+    };
+    const formatDate = (date) => {
+        const options = {
+            day: "2-digit",
+            month: "2-digit",
+            year: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+        };
+        return new Date(date).toLocaleString("en-GB", options).replace(",", "");
     };
     return (
         <View style={styles.apartmentCard}>
@@ -95,11 +117,17 @@ const ApartmentDropdown = ({ apartment, name }) => {
                     {comments.length > 0 ? (
                         comments.map((commentItem, index) => (
                             <View key={index} style={styles.commentItem}>
-                                {/* <Text style={styles.userIcon}>👤</Text> */}
-                                <Text style={styles.commentText}>
-                                    {" "}
-                                    {filterCommentText(commentItem.text)}
+                                <Text style={styles.name}>
+                                    {commentItem.name || "Anonymous"}
                                 </Text>
+                                <View style={styles.commentContent}>
+                                    <Text style={styles.commentText}>
+                                        {filterCommentText(commentItem.text)}
+                                    </Text>
+                                    <Text style={styles.time}>
+                                        {formatDate(commentItem.timestamp)}
+                                    </Text>
+                                </View>
                             </View>
                         ))
                     ) : (
@@ -160,16 +188,32 @@ const styles = StyleSheet.create({
     },
     commentItem: {
         flexDirection: "row",
-        alignItems: "center",
+        // alignItems: "center",
+        justifyContent: "space-between",
         marginBottom: 8,
     },
-    userIcon: {
-        marginRight: 8,
-        fontSize: 18,
+    commentContent: {
+        flex: 1, //
+        flexDirection: "row",
+        justifyContent: "space-between",
+        // alignItems: 'flex-start'
+    },
+    name: {
+        fontWeight: "bold",
+        marginRight: 10,
     },
     commentText: {
         // fontSize: 16,
         color: "#777",
+        flex: 1,
+        marginRight: 8,
+        flexWrap: "wrap",
+    },
+    time: {
+        fontSize: 12,
+        marginLeft: 10,
+        color: "#777",
+        marginTop: 2,
     },
     noComments: {
         // fontStyle: "italic",

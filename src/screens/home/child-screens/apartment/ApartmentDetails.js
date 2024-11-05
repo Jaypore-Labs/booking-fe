@@ -14,7 +14,9 @@ const ApartmentDetails = ({ route }) => {
             <ScrollView style={styles.container}>
                 <View style={styles.detailsContainer}>
                     <Text style={styles.title}>Name - {apartment.name}</Text>
-                    <Text style={styles.price}>Price - ₹{apartment.price}</Text>
+                    <Text style={styles.price}>
+                        Price - {"\u20AC"} {apartment.price}
+                    </Text>
                     <Text style={styles.type}>Type - {apartment.type}</Text>
                     <Text style={styles.description}>
                         Description - {apartment.description}

@@ -131,10 +131,7 @@ const ApartmentList = () => {
         {generateFullDateRange()
           .slice(0, visibleDays)
           .map((date, dateIndex) => {
-            console.log(date);
-            console.log(item.availability);
             const isAvailable = item.availability[date] ?? null;
-            console.log(isAvailable);
             return (
               <View
                 key={dateIndex}

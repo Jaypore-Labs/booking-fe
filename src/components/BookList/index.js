@@ -127,8 +127,12 @@ export default function BookingsList({ navigation }) {
                                 <Text style={styles.name}>
                                     Name: {apartments[item.apartmentId] || "Loading..."}
                                 </Text>
-                                <Text style={styles.price}>Price: {item.price}</Text>
-                                <Text style={styles.light}>Deposit: {item.deposit}</Text>
+                                <Text style={styles.price}>
+                                    Price: {"\u20AC"} {item.price}
+                                </Text>
+                                <Text style={styles.light}>
+                                    Deposit: {"\u20AC"} {item.deposit}
+                                </Text>
                                 <Text style={styles.light}>
                                     Description: {item.description}
                                 </Text>
