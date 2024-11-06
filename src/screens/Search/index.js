@@ -122,8 +122,7 @@ export default function Search() {
                                         <View style={styles.propertyInfoRow}>
                                             <Text style={styles.name}>Name: {item.name}</Text>
                                             <Text style={styles.price}>
-                                                Price: {"\u20B9"}
-                                                {item.price}/DAY
+                                                Price: {"\u20AC"} {item.price}/DAY
                                             </Text>
                                         </View>
                                         <Text style={styles.typetext}>Type: {item.type}</Text>

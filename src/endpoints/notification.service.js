@@ -1,7 +1,15 @@
 import axiosInstance from "../services/axios";
 
-const getNotifications = async () => {
-    return axiosInstance.get("/notifications").then((res) => res.data);
+const getNotifications = async ({
+    page = 1,
+    limit = 10,
+    sortBy = "createdAt:desc",
+} = {}) => {
+    return axiosInstance
+        .get("/notifications", {
+            params: { page, limit, sortBy },
+        })
+        .then((res) => res.data);
 };
 
 export const createNotification = async (payload) => {
